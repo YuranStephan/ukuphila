@@ -1,0 +1,13 @@
+node_modules
+.next
+out
+.data
+.qa
+.vercel
+*.tsbuildinfo
+.env
+.env.local
+.env.*.local
+legacy/**/.env
+legacy/**/*.db
+.DS_Store

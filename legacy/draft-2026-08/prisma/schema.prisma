@@ -1,0 +1,178 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 String    @id @default(cuid())
+  telefone           String    @unique
+  nome               String
+  fotoUrl            String?   @map("foto_url")
+  nivelKyc           Int       @default(1) @map("nivel_kyc")
+  agenteId           String?   @map("agente_id")
+  criadoEm           DateTime  @default(now()) @map("criado_em")
+  diasComTransacoes  Int       @default(0) @map("dias_com_transacoes")
+  ultimoDiaTransacao String?   @map("ultimo_dia_transacao")
+  idioma             String    @default("pt")
+  notificacoes       Boolean   @default(true)
+
+  agente         Agent?              @relation(fields: [agenteId], references: [id])
+  pockets        Pocket[]
+  transactions   Transaction[]
+  inventory      InventoryItem[]
+  xitiqueOwned   XitiqueGroup[]      @relation("GroupCreator")
+  xitiqueMembers XitiqueMember[]
+  contributions  XitiqueContribution[]
+  syncActions    SyncAction[]
+  conflicts      SyncConflict[]
+
+  @@map("users")
+}
+
+model Agent {
+  id                  String @id @default(cuid())
+  nome                String
+  quiosqueLocalizacao String @map("quiosque_localizacao")
+  contacto            String
+  users               User[]
+
+  @@map("agents")
+}
+
+model Pocket {
+  id         String        @id @default(cuid())
+  userId     String        @map("user_id")
+  tipo       String
+  saldoAtual Int           @default(0) @map("saldo_atual")
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@unique([userId, tipo])
+  @@map("pockets")
+}
+
+model Transaction {
+  id             String    @id @default(cuid())
+  userId         String    @map("user_id")
+  pocketId       String    @map("pocket_id")
+  tipo           String
+  valor          Int
+  produtoId      String?   @map("produto_id")
+  metodoRegisto  String    @default("texto") @map("metodo_registo")
+  criadoEm       DateTime  @default(now()) @map("criado_em")
+  sincronizadoEm DateTime? @map("sincronizado_em")
+  clientUuid     String    @unique @map("client_uuid")
+  precisaRevisao Boolean   @default(false) @map("precisa_revisao")
+  nota           String?
+
+  user     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pocket   Pocket         @relation(fields: [pocketId], references: [id], onDelete: Cascade)
+  produto  InventoryItem? @relation(fields: [produtoId], references: [id])
+
+  @@index([userId, criadoEm])
+  @@map("transactions")
+}
+
+model InventoryItem {
+  id                String   @id @default(cuid())
+  userId            String   @map("user_id")
+  nomeProduto       String   @map("nome_produto")
+  quantidadeAtual   Int      @default(0) @map("quantidade_atual")
+  limiarStockBaixo  Int      @default(5) @map("limiar_stock_baixo")
+  atualizadoEm      DateTime @default(now()) @map("atualizado_em")
+  icone             String   @default("caixa")
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@index([userId])
+  @@map("inventory_items")
+}
+
+model XitiqueGroup {
+  id                String   @id @default(cuid())
+  nome              String
+  criadoPorUserId   String   @map("criado_por_user_id")
+  valorContribuicao Int      @map("valor_contribuicao")
+  periodicidade     String
+  codigoConvite     String   @unique @map("codigo_convite")
+  criadoEm          DateTime @default(now()) @map("criado_em")
+
+  criador       User                  @relation("GroupCreator", fields: [criadoPorUserId], references: [id])
+  members       XitiqueMember[]
+  contributions XitiqueContribution[]
+
+  @@map("xitique_groups")
+}
+
+model XitiqueMember {
+  id      String @id @default(cuid())
+  groupId String @map("group_id")
+  userId  String @map("user_id")
+  estado  String @default("activo")
+  nome    String
+
+  group XitiqueGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user  User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+  @@map("xitique_members")
+}
+
+model XitiqueContribution {
+  id          String    @id @default(cuid())
+  groupId     String    @map("group_id")
+  userId      String    @map("user_id")
+  valor       Int
+  dataPrevista DateTime @map("data_prevista")
+  dataPago    DateTime? @map("data_pago")
+  estado      String    @default("pendente")
+
+  group XitiqueGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user  User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([groupId, dataPrevista])
+  @@map("xitique_contributions")
+}
+
+model OtpChallenge {
+  id        String   @id @default(cuid())
+  telefone  String
+  codigo    String
+  expiresAt DateTime @map("expires_at")
+  usado     Boolean  @default(false)
+
+  @@index([telefone])
+  @@map("otp_challenges")
+}
+
+model SyncAction {
+  id         String   @id @default(cuid())
+  userId     String   @map("user_id")
+  clientUuid String   @unique @map("client_uuid")
+  tipo       String
+  payload    String
+  timestamp  DateTime
+  aplicadoEm DateTime @default(now()) @map("aplicado_em")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sync_actions")
+}
+
+model SyncConflict {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  mensagem    String
+  payload     String
+  resolvido   Boolean  @default(false)
+  criadoEm    DateTime @default(now()) @map("criado_em")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sync_conflicts")
+}
