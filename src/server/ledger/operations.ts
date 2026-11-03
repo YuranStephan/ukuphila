@@ -243,9 +243,9 @@ export async function recordCapital(tx: Tx, ctx: OperationContext, input: { amou
 export async function customerBalance(db: Executor, userId: string, customerId: string) {
   const result = await db.execute(sql`
     select coalesce(sum(case e.kind when 'venda_fiado' then e.amount_cents when 'fiado_recebido' then -e.amount_cents else 0 end), 0) as total
-    from journal_entries e
+    from ukuphila.journal_entries e
     where e.user_id = ${userId} and e.customer_id = ${customerId}
-      and not exists (select 1 from journal_entries r where r.reverses_id = e.id)
+      and not exists (select 1 from ukuphila.journal_entries r where r.reverses_id = e.id)
   `);
   return Number(rowsOf<{ total: string }>(result)[0]?.total ?? 0);
 }

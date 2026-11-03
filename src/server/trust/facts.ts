@@ -16,12 +16,12 @@ export async function gatherFacts(db: Executor, userId: string): Promise<TrustFa
         count(distinct (occurred_at at time zone 'Africa/Maputo')::date) filter (where occurred_at >= ${daysAgo(90, now).toISOString()}::timestamptz) as d90,
         min(occurred_at) as first_at,
         count(*) filter (where kind = 'transferencia' and category = 'retirada_casa' and occurred_at >= ${daysAgo(60, now).toISOString()}::timestamptz) as transfers
-      from journal_entries
+      from ukuphila.journal_entries
       where user_id = ${userId} and kind in ('venda','venda_fiado','despesa','compra_stock','fiado_recebido','transferencia')
     `),
     db.execute(sql`
       select date_trunc('week', occurred_at at time zone 'Africa/Maputo') as week, sum(amount_cents) as total
-      from journal_entries
+      from ukuphila.journal_entries
       where user_id = ${userId} and kind in ('venda','venda_fiado') and occurred_at >= ${daysAgo(84, now).toISOString()}::timestamptz
       group by 1
     `),
@@ -30,15 +30,15 @@ export async function gatherFacts(db: Executor, userId: string): Promise<TrustFa
       select
         count(distinct date_trunc('month', occurred_at at time zone 'Africa/Maputo')) filter (where kind = 'poupanca_deposito' and occurred_at >= ${daysAgo(182, now).toISOString()}::timestamptz) as months,
         coalesce(sum(case kind when 'poupanca_deposito' then amount_cents when 'poupanca_levantamento' then -amount_cents else 0 end), 0) as balance
-      from journal_entries where user_id = ${userId} and kind in ('poupanca_deposito','poupanca_levantamento')
+      from ukuphila.journal_entries where user_id = ${userId} and kind in ('poupanca_deposito','poupanca_levantamento')
     `),
     db.execute(sql`
       select
         count(*) filter (where r.due_date <= ${maputoDay(now)}::date) as due,
         count(*) filter (where c.status = 'confirmada' and c.late_days = 0) as on_time
-      from xitique_contributions c
-      join xitique_rounds r on r.id = c.round_id
-      join xitique_members m on m.id = c.member_id
+      from ukuphila.xitique_contributions c
+      join ukuphila.xitique_rounds r on r.id = c.round_id
+      join ukuphila.xitique_members m on m.id = c.member_id
       where m.user_id = ${userId}
     `),
     db.execute(sql`
@@ -46,9 +46,9 @@ export async function gatherFacts(db: Executor, userId: string): Promise<TrustFa
         count(*) filter (where i.due_date <= ${maputoDay(now)}::date) as due,
         count(*) filter (where i.status = 'pago' and (i.paid_at at time zone 'Africa/Maputo')::date <= i.due_date) as on_time,
         count(*) filter (where i.status = 'em_atraso') as overdue,
-        (select count(*) from credit_contracts cc where cc.user_id = ${userId} and cc.status = 'liquidado') as settled
-      from credit_instalments i
-      join credit_contracts k on k.id = i.contract_id
+        (select count(*) from ukuphila.credit_contracts cc where cc.user_id = ${userId} and cc.status = 'liquidado') as settled
+      from ukuphila.credit_instalments i
+      join ukuphila.credit_contracts k on k.id = i.contract_id
       where k.user_id = ${userId}
     `),
   ]);

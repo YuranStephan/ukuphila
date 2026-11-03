@@ -13,7 +13,7 @@ export async function programmeKpis(db: Executor) {
         count(*) filter (where u.created_at >= ${daysAgo(30, now).toISOString()}::timestamptz) as new30,
         count(*) filter (where u.status = 'preliminar') as preliminar,
         count(*) filter (where b.onboarded_at is not null) as onboarded
-      from users u join businesses b on b.owner_id = u.id where u.role = 'merchant'
+      from ukuphila.users u join ukuphila.businesses b on b.owner_id = u.id where u.role = 'merchant'
     `),
     db.execute(sql`
       select
@@ -26,35 +26,35 @@ export async function programmeKpis(db: Executor) {
         count(*) filter (where channel = 'voz' and occurred_at >= ${daysAgo(30, now).toISOString()}::timestamptz) as voice30,
         count(*) filter (where channel = 'whatsapp' and occurred_at >= ${daysAgo(30, now).toISOString()}::timestamptz) as whatsapp30,
         count(*) filter (where channel = 'agente' and occurred_at >= ${daysAgo(30, now).toISOString()}::timestamptz) as agent30
-      from journal_entries where kind <> 'estorno'
+      from ukuphila.journal_entries where kind <> 'estorno'
     `),
     db.execute(sql`
       select count(distinct user_id) filter (where kind = 'poupanca_deposito' and occurred_at >= ${daysAgo(60, now).toISOString()}::timestamptz) as savers
-      from journal_entries
+      from ukuphila.journal_entries
     `),
     db.execute(sql`
       select
-        (select count(*) from xitique_groups where status = 'activo') as groups,
-        (select count(distinct user_id) from xitique_members where user_id is not null) as members,
-        coalesce((select sum(amount_cents) from xitique_contributions where status = 'confirmada'), 0) as contributed,
-        (select count(*) from xitique_contributions where status = 'confirmada' and late_days = 0) as on_time,
-        (select count(*) from xitique_contributions where status in ('confirmada','atrasada')) as due
+        (select count(*) from ukuphila.xitique_groups where status = 'activo') as groups,
+        (select count(distinct user_id) from ukuphila.xitique_members where user_id is not null) as members,
+        coalesce((select sum(amount_cents) from ukuphila.xitique_contributions where status = 'confirmada'), 0) as contributed,
+        (select count(*) from ukuphila.xitique_contributions where status = 'confirmada' and late_days = 0) as on_time,
+        (select count(*) from ukuphila.xitique_contributions where status in ('confirmada','atrasada')) as due
     `),
     db.execute(sql`
       select
-        (select count(*) from documents where status in ('submetido','em_revisao')) as kyc_queue,
-        (select count(*) from incidents where status <> 'resolvido') as open_incidents,
-        (select coalesce(avg(extract(epoch from reviewed_at - submitted_at)) / 3600, 0) from documents where reviewed_at is not null) as kyc_hours
+        (select count(*) from ukuphila.documents where status in ('submetido','em_revisao')) as kyc_queue,
+        (select count(*) from ukuphila.incidents where status <> 'resolvido') as open_incidents,
+        (select coalesce(avg(extract(epoch from reviewed_at - submitted_at)) / 3600, 0) from ukuphila.documents where reviewed_at is not null) as kyc_hours
     `),
     db.execute(sql`
       select count(*) as total,
         count(*) filter (where status = 'conflict') as conflicts,
         count(*) filter (where status = 'rejected') as rejected
-      from sync_ops where received_at >= ${daysAgo(30, now).toISOString()}::timestamptz
+      from ukuphila.sync_ops where received_at >= ${daysAgo(30, now).toISOString()}::timestamptz
     `),
     db.execute(sql`
       select count(*) as turns, count(*) filter (where escalated) as escalated, count(*) filter (where intent = 'UNKNOWN') as unknown
-      from ai_turns where created_at >= ${daysAgo(30, now).toISOString()}::timestamptz
+      from ukuphila.ai_turns where created_at >= ${daysAgo(30, now).toISOString()}::timestamptz
     `),
   ]);
   const m = rowsOf<Record<string, string>>(merchants)[0];
@@ -100,7 +100,7 @@ export async function activitySeries(db: Executor, days = 60) {
     await db.execute(sql`
       select (occurred_at at time zone 'Africa/Maputo')::date::text as day, count(*) as entries, count(distinct user_id) as merchants,
         coalesce(sum(amount_cents) filter (where kind in ('venda','venda_fiado')), 0) as sales
-      from journal_entries where occurred_at >= ${since}::date and kind <> 'estorno'
+      from ukuphila.journal_entries where occurred_at >= ${since}::date and kind <> 'estorno'
       group by 1 order by 1
     `),
   );
@@ -111,7 +111,7 @@ export async function ringFunnel(db: Executor) {
   const rows = rowsOf<{ ring: number; total: string }>(
     await db.execute(sql`
       select ring, count(*) as total from (
-        select distinct on (user_id) user_id, ring from trust_evaluations order by user_id, created_at desc
+        select distinct on (user_id) user_id, ring from ukuphila.trust_evaluations order by user_id, created_at desc
       ) latest group by ring order by ring
     `),
   );
@@ -124,9 +124,9 @@ export async function marketBreakdown(db: Executor) {
       select m.id, m.name, m.stage, count(distinct b.owner_id) as merchants,
         count(distinct e.user_id) filter (where e.occurred_at >= ${daysAgo(7).toISOString()}::timestamptz) as active,
         coalesce(sum(e.amount_cents) filter (where e.kind in ('venda','venda_fiado') and e.occurred_at >= ${daysAgo(30).toISOString()}::timestamptz), 0) as sales
-      from markets m
-      left join businesses b on b.market_id = m.id
-      left join journal_entries e on e.user_id = b.owner_id
+      from ukuphila.markets m
+      left join ukuphila.businesses b on b.market_id = m.id
+      left join ukuphila.journal_entries e on e.user_id = b.owner_id
       group by m.id order by merchants desc
     `),
   );
@@ -137,13 +137,13 @@ export async function agentPerformance(db: Executor) {
   const rows = rowsOf<{ id: string; code: string; name: string; market: string; status: string; merchants: string; active: string; visits: string; open_incidents: string; earned: string }>(
     await db.execute(sql`
       select a.id, a.code, u.display_name as name, m.name as market, a.status,
-        (select count(*) from businesses b where b.agent_id = a.id) as merchants,
-        (select count(distinct e.user_id) from journal_entries e join businesses b on b.owner_id = e.user_id
+        (select count(*) from ukuphila.businesses b where b.agent_id = a.id) as merchants,
+        (select count(distinct e.user_id) from ukuphila.journal_entries e join ukuphila.businesses b on b.owner_id = e.user_id
           where b.agent_id = a.id and e.occurred_at >= ${daysAgo(7).toISOString()}::timestamptz) as active,
-        (select count(*) from visits v where v.agent_id = a.id and v.at >= ${daysAgo(30).toISOString()}::timestamptz) as visits,
-        (select count(*) from incidents i join businesses b on b.owner_id = i.subject_user_id where b.agent_id = a.id and i.status <> 'resolvido') as open_incidents,
-        (select coalesce(sum(amount_cents), 0) from agent_earnings g where g.agent_id = a.id) as earned
-      from agents a join users u on u.id = a.user_id join markets m on m.id = a.market_id
+        (select count(*) from ukuphila.visits v where v.agent_id = a.id and v.at >= ${daysAgo(30).toISOString()}::timestamptz) as visits,
+        (select count(*) from ukuphila.incidents i join ukuphila.businesses b on b.owner_id = i.subject_user_id where b.agent_id = a.id and i.status <> 'resolvido') as open_incidents,
+        (select coalesce(sum(amount_cents), 0) from ukuphila.agent_earnings g where g.agent_id = a.id) as earned
+      from ukuphila.agents a join ukuphila.users u on u.id = a.user_id join ukuphila.markets m on m.id = a.market_id
       order by merchants desc
     `),
   );
@@ -169,13 +169,13 @@ export async function creditPortfolio(db: Executor) {
   }>(
     await db.execute(sql`
       select c.id, c.code, c.status, c.user_id, u.display_name as merchant, m.name as market, m.id as market_id, s.name as supplier, s.id as supplier_id, c.principal_cents as principal,
-        coalesce((select sum(i.amount_cents - i.paid_cents) from credit_instalments i where i.contract_id = c.id), c.principal_cents + c.fee_cents) as outstanding,
-        (select min(i.due_date)::text from credit_instalments i where i.contract_id = c.id and i.status = 'em_atraso') as oldest_due
-      from credit_contracts c
-      join users u on u.id = c.user_id
-      join businesses b on b.owner_id = c.user_id
-      join markets m on m.id = b.market_id
-      join suppliers s on s.id = c.supplier_id
+        coalesce((select sum(i.amount_cents - i.paid_cents) from ukuphila.credit_instalments i where i.contract_id = c.id), c.principal_cents + c.fee_cents) as outstanding,
+        (select min(i.due_date)::text from ukuphila.credit_instalments i where i.contract_id = c.id and i.status = 'em_atraso') as oldest_due
+      from ukuphila.credit_contracts c
+      join ukuphila.users u on u.id = c.user_id
+      join ukuphila.businesses b on b.owner_id = c.user_id
+      join ukuphila.markets m on m.id = b.market_id
+      join ukuphila.suppliers s on s.id = c.supplier_id
       where c.status in ('aguarda_entrega','activo','em_atraso','incumprimento')
       order by outstanding desc
     `),
@@ -215,9 +215,9 @@ export async function repaymentStats(db: Executor) {
       select
         count(*) filter (where i.due_date <= current_date) as due,
         count(*) filter (where i.status = 'pago' and (i.paid_at at time zone 'Africa/Maputo')::date <= i.due_date) as on_time,
-        (select count(*) from credit_contracts where status = 'liquidado') as settled,
-        (select coalesce(sum(amount_cents), 0) from credit_repayments) as collected
-      from credit_instalments i
+        (select count(*) from ukuphila.credit_contracts where status = 'liquidado') as settled,
+        (select coalesce(sum(amount_cents), 0) from ukuphila.credit_repayments) as collected
+      from ukuphila.credit_instalments i
     `),
   );
   return { due: Number(row?.due ?? 0), onTime: Number(row?.on_time ?? 0), settled: Number(row?.settled ?? 0), collectedCents: Number(row?.collected ?? 0) };

@@ -39,9 +39,9 @@ export async function buildPassportSnapshot(db: Db, userId: string, scope: strin
     .limit(1);
   const [sales] = rowsOf<{ total: string }>(
     await db.execute(sql`
-      select coalesce(sum(amount_cents), 0) as total from journal_entries e
+      select coalesce(sum(amount_cents), 0) as total from ukuphila.journal_entries e
       where e.user_id = ${userId} and e.kind in ('venda','venda_fiado') and e.occurred_at >= now() - interval '30 days'
-        and not exists (select 1 from journal_entries r where r.reverses_id = e.id)
+        and not exists (select 1 from ukuphila.journal_entries r where r.reverses_id = e.id)
     `),
   );
   const snapshot: Record<string, unknown> = { generatedAt: new Date().toISOString(), policyVersion: trust.policyVersion };

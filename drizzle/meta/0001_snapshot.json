@@ -1,12 +1,12 @@
 {
-  "id": "ee3082b0-ccc7-4bd4-92a2-21c827627ca9",
-  "prevId": "6a60d21e-8909-45d7-96b8-dca64ab5a87b",
+  "id": "922d35dc-8a1e-4bce-94d6-8617e8405ad2",
+  "prevId": "b8293009-c2cd-42ae-94fc-5da971fd5fd0",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.access_log": {
+    "ukuphila.access_log": {
       "name": "access_log",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -84,6 +84,7 @@
             "subject_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -97,6 +98,7 @@
             "actor_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -110,9 +112,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.accounts": {
+    "ukuphila.accounts": {
       "name": "accounts",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -178,6 +180,7 @@
             "user_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -191,9 +194,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.agent_earnings": {
+    "ukuphila.agent_earnings": {
       "name": "agent_earnings",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -272,6 +275,7 @@
             "agent_id"
           ],
           "tableTo": "agents",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -285,6 +289,7 @@
             "subject_user_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -298,9 +303,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.agents": {
+    "ukuphila.agents": {
       "name": "agents",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -369,6 +374,7 @@
             "user_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -382,6 +388,7 @@
             "market_id"
           ],
           "tableTo": "markets",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -410,9 +417,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.ai_turns": {
+    "ukuphila.ai_turns": {
       "name": "ai_turns",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -536,6 +543,7 @@
             "user_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -549,9 +557,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.audit_events": {
+    "ukuphila.audit_events": {
       "name": "audit_events",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "seq": {
           "name": "seq",
@@ -675,9 +683,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.businesses": {
+    "ukuphila.businesses": {
       "name": "businesses",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -795,6 +803,7 @@
             "owner_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -808,6 +817,7 @@
             "agent_id"
           ],
           "tableTo": "agents",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -821,6 +831,7 @@
             "market_id"
           ],
           "tableTo": "markets",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -842,9 +853,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.consents": {
+    "ukuphila.consents": {
       "name": "consents",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -935,6 +946,7 @@
             "user_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -948,6 +960,7 @@
             "captured_by"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -961,9 +974,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.credit_applications": {
+    "ukuphila.credit_applications": {
       "name": "credit_applications",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -1100,6 +1113,7 @@
             "user_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -1113,6 +1127,7 @@
             "supplier_id"
           ],
           "tableTo": "suppliers",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -1126,6 +1141,7 @@
             "policy_id"
           ],
           "tableTo": "credit_policies",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -1147,14 +1163,14 @@
       "checkConstraints": {
         "credit_requested_ck": {
           "name": "credit_requested_ck",
-          "value": "\"credit_applications\".\"requested_cents\" > 0"
+          "value": "\"ukuphila\".\"credit_applications\".\"requested_cents\" > 0"
         }
       },
       "isRLSEnabled": false
     },
-    "public.credit_contracts": {
+    "ukuphila.credit_contracts": {
       "name": "credit_contracts",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -1303,6 +1319,7 @@
             "application_id"
           ],
           "tableTo": "credit_applications",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -1316,6 +1333,7 @@
             "user_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -1329,6 +1347,7 @@
             "supplier_id"
           ],
           "tableTo": "suppliers",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -1342,6 +1361,7 @@
             "delivery_confirmed_by"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -1370,9 +1390,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.credit_decisions": {
+    "ukuphila.credit_decisions": {
       "name": "credit_decisions",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -1450,6 +1470,7 @@
             "application_id"
           ],
           "tableTo": "credit_applications",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -1463,6 +1484,7 @@
             "actor_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -1476,9 +1498,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.credit_instalments": {
+    "ukuphila.credit_instalments": {
       "name": "credit_instalments",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -1578,6 +1600,7 @@
             "contract_id"
           ],
           "tableTo": "credit_contracts",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -1591,14 +1614,14 @@
       "checkConstraints": {
         "credit_paid_ck": {
           "name": "credit_paid_ck",
-          "value": "\"credit_instalments\".\"paid_cents\" >= 0 and \"credit_instalments\".\"paid_cents\" <= \"credit_instalments\".\"amount_cents\""
+          "value": "\"ukuphila\".\"credit_instalments\".\"paid_cents\" >= 0 and \"ukuphila\".\"credit_instalments\".\"paid_cents\" <= \"ukuphila\".\"credit_instalments\".\"amount_cents\""
         }
       },
       "isRLSEnabled": false
     },
-    "public.credit_policies": {
+    "ukuphila.credit_policies": {
       "name": "credit_policies",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -1672,7 +1695,7 @@
           "isUnique": true,
           "with": {},
           "method": "btree",
-          "where": "\"credit_policies\".\"status\" = 'aprovada'",
+          "where": "\"ukuphila\".\"credit_policies\".\"status\" = 'aprovada'",
           "concurrently": false
         }
       },
@@ -1684,6 +1707,7 @@
             "created_by"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -1697,6 +1721,7 @@
             "approved_by"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -1718,14 +1743,14 @@
       "checkConstraints": {
         "credit_policy_four_eyes_ck": {
           "name": "credit_policy_four_eyes_ck",
-          "value": "\"credit_policies\".\"approved_by\" is null or \"credit_policies\".\"approved_by\" <> \"credit_policies\".\"created_by\""
+          "value": "\"ukuphila\".\"credit_policies\".\"approved_by\" is null or \"ukuphila\".\"credit_policies\".\"approved_by\" <> \"ukuphila\".\"credit_policies\".\"created_by\""
         }
       },
       "isRLSEnabled": false
     },
-    "public.credit_repayments": {
+    "ukuphila.credit_repayments": {
       "name": "credit_repayments",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -1803,6 +1828,7 @@
             "contract_id"
           ],
           "tableTo": "credit_contracts",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -1816,6 +1842,7 @@
             "recorded_by"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -1829,6 +1856,7 @@
             "entry_id"
           ],
           "tableTo": "journal_entries",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -1850,9 +1878,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.customers": {
+    "ukuphila.customers": {
       "name": "customers",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -1924,6 +1952,7 @@
             "user_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -1937,9 +1966,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.device_leases": {
+    "ukuphila.device_leases": {
       "name": "device_leases",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -2038,6 +2067,7 @@
             "device_id"
           ],
           "tableTo": "devices",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -2051,6 +2081,7 @@
             "user_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -2064,6 +2095,7 @@
             "agent_id"
           ],
           "tableTo": "agents",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -2085,9 +2117,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.device_models": {
+    "ukuphila.device_models": {
       "name": "device_models",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -2130,9 +2162,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.devices": {
+    "ukuphila.devices": {
       "name": "devices",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -2236,6 +2268,7 @@
             "user_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -2249,6 +2282,7 @@
             "model_id"
           ],
           "tableTo": "device_models",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -2262,9 +2296,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.document_blobs": {
+    "ukuphila.document_blobs": {
       "name": "document_blobs",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "document_id": {
           "name": "document_id",
@@ -2288,6 +2322,7 @@
             "document_id"
           ],
           "tableTo": "documents",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -2301,9 +2336,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.document_events": {
+    "ukuphila.document_events": {
       "name": "document_events",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -2369,6 +2404,7 @@
             "document_id"
           ],
           "tableTo": "documents",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -2382,6 +2418,7 @@
             "actor_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -2395,9 +2432,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.documents": {
+    "ukuphila.documents": {
       "name": "documents",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -2576,6 +2613,7 @@
             "user_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -2589,6 +2627,7 @@
             "submitted_by"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -2602,6 +2641,7 @@
             "reviewer_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -2615,14 +2655,14 @@
       "checkConstraints": {
         "documents_rejected_reason_ck": {
           "name": "documents_rejected_reason_ck",
-          "value": "\"documents\".\"status\" <> 'rejeitado' or \"documents\".\"rejection_reason\" is not null"
+          "value": "\"ukuphila\".\"documents\".\"status\" <> 'rejeitado' or \"ukuphila\".\"documents\".\"rejection_reason\" is not null"
         }
       },
       "isRLSEnabled": false
     },
-    "public.entry_reviews": {
+    "ukuphila.entry_reviews": {
       "name": "entry_reviews",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -2688,6 +2728,7 @@
             "entry_id"
           ],
           "tableTo": "journal_entries",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -2701,6 +2742,7 @@
             "actor_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -2714,9 +2756,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.incidents": {
+    "ukuphila.incidents": {
       "name": "incidents",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -2848,6 +2890,7 @@
             "subject_user_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -2861,6 +2904,7 @@
             "opened_by"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -2874,6 +2918,7 @@
             "assigned_to"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -2895,9 +2940,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.journal_entries": {
+    "ukuphila.journal_entries": {
       "name": "journal_entries",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -3076,7 +3121,7 @@
           "isUnique": true,
           "with": {},
           "method": "btree",
-          "where": "\"journal_entries\".\"reverses_id\" is not null",
+          "where": "\"ukuphila\".\"journal_entries\".\"reverses_id\" is not null",
           "concurrently": false
         },
         "journal_user_time_idx": {
@@ -3130,6 +3175,7 @@
             "user_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -3143,6 +3189,7 @@
             "recorded_by"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -3164,14 +3211,14 @@
       "checkConstraints": {
         "journal_amount_ck": {
           "name": "journal_amount_ck",
-          "value": "\"journal_entries\".\"amount_cents\" > 0"
+          "value": "\"ukuphila\".\"journal_entries\".\"amount_cents\" > 0"
         }
       },
       "isRLSEnabled": false
     },
-    "public.kb_chunks": {
+    "ukuphila.kb_chunks": {
       "name": "kb_chunks",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -3230,6 +3277,7 @@
             "document_id"
           ],
           "tableTo": "kb_documents",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -3243,9 +3291,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.kb_documents": {
+    "ukuphila.kb_documents": {
       "name": "kb_documents",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -3357,6 +3405,7 @@
             "approved_by"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -3370,9 +3419,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.kyc_attestations": {
+    "ukuphila.kyc_attestations": {
       "name": "kyc_attestations",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -3444,6 +3493,7 @@
             "user_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -3457,6 +3507,7 @@
             "agent_id"
           ],
           "tableTo": "agents",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -3470,9 +3521,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.kyc_events": {
+    "ukuphila.kyc_events": {
       "name": "kyc_events",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -3550,6 +3601,7 @@
             "user_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -3563,6 +3615,7 @@
             "actor_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -3576,9 +3629,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.kyc_profiles": {
+    "ukuphila.kyc_profiles": {
       "name": "kyc_profiles",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "user_id": {
           "name": "user_id",
@@ -3630,6 +3683,7 @@
             "user_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -3643,9 +3697,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.leads": {
+    "ukuphila.leads": {
       "name": "leads",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -3741,9 +3795,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.lease_payments": {
+    "ukuphila.lease_payments": {
       "name": "lease_payments",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -3827,6 +3881,7 @@
             "lease_id"
           ],
           "tableTo": "device_leases",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -3840,9 +3895,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.markets": {
+    "ukuphila.markets": {
       "name": "markets",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -3925,9 +3980,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.notifications": {
+    "ukuphila.notifications": {
       "name": "notifications",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -4019,6 +4074,7 @@
             "user_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -4032,9 +4088,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.otp_challenges": {
+    "ukuphila.otp_challenges": {
       "name": "otp_challenges",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -4118,9 +4174,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.passports": {
+    "ukuphila.passports": {
       "name": "passports",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -4217,6 +4273,7 @@
             "user_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -4238,9 +4295,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.postings": {
+    "ukuphila.postings": {
       "name": "postings",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -4308,6 +4365,7 @@
             "entry_id"
           ],
           "tableTo": "journal_entries",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -4321,6 +4379,7 @@
             "account_id"
           ],
           "tableTo": "accounts",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -4334,14 +4393,14 @@
       "checkConstraints": {
         "postings_nonzero_ck": {
           "name": "postings_nonzero_ck",
-          "value": "\"postings\".\"amount_cents\" <> 0"
+          "value": "\"ukuphila\".\"postings\".\"amount_cents\" <> 0"
         }
       },
       "isRLSEnabled": false
     },
-    "public.products": {
+    "ukuphila.products": {
       "name": "products",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -4455,6 +4514,7 @@
             "user_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -4468,9 +4528,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.proposals": {
+    "ukuphila.proposals": {
       "name": "proposals",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -4579,6 +4639,7 @@
             "user_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -4592,9 +4653,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.rate_limits": {
+    "ukuphila.rate_limits": {
       "name": "rate_limits",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "key": {
           "name": "key",
@@ -4625,9 +4686,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.read_receipts": {
+    "ukuphila.read_receipts": {
       "name": "read_receipts",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "user_id": {
           "name": "user_id",
@@ -4665,9 +4726,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.readiness_items": {
+    "ukuphila.readiness_items": {
       "name": "readiness_items",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -4735,9 +4796,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.risk_alerts": {
+    "ukuphila.risk_alerts": {
       "name": "risk_alerts",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -4864,6 +4925,7 @@
             "subject_user_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -4877,6 +4939,7 @@
             "market_id"
           ],
           "tableTo": "markets",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -4890,6 +4953,7 @@
             "case_id"
           ],
           "tableTo": "risk_cases",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -4903,6 +4967,7 @@
             "closed_by"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -4924,9 +4989,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.risk_case_notes": {
+    "ukuphila.risk_case_notes": {
       "name": "risk_case_notes",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -4986,6 +5051,7 @@
             "case_id"
           ],
           "tableTo": "risk_cases",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -4999,6 +5065,7 @@
             "actor_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -5012,9 +5079,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.risk_cases": {
+    "ukuphila.risk_cases": {
       "name": "risk_cases",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -5117,6 +5184,7 @@
             "owner_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -5130,6 +5198,7 @@
             "subject_user_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -5151,9 +5220,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.savings_goals": {
+    "ukuphila.savings_goals": {
       "name": "savings_goals",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -5226,6 +5295,7 @@
             "user_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -5239,9 +5309,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.sessions": {
+    "ukuphila.sessions": {
       "name": "sessions",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -5331,6 +5401,7 @@
             "user_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -5352,9 +5423,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.settings": {
+    "ukuphila.settings": {
       "name": "settings",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "key": {
           "name": "key",
@@ -5390,9 +5461,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.stock_moves": {
+    "ukuphila.stock_moves": {
       "name": "stock_moves",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -5482,6 +5553,7 @@
             "user_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -5495,6 +5567,7 @@
             "product_id"
           ],
           "tableTo": "products",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -5508,6 +5581,7 @@
             "entry_id"
           ],
           "tableTo": "journal_entries",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -5521,9 +5595,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.supplier_products": {
+    "ukuphila.supplier_products": {
       "name": "supplier_products",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -5589,6 +5663,7 @@
             "supplier_id"
           ],
           "tableTo": "suppliers",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -5602,9 +5677,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.suppliers": {
+    "ukuphila.suppliers": {
       "name": "suppliers",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -5668,6 +5743,7 @@
             "owner_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -5689,9 +5765,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.sync_conflicts": {
+    "ukuphila.sync_conflicts": {
       "name": "sync_conflicts",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -5782,6 +5858,7 @@
             "user_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -5795,6 +5872,7 @@
             "resolved_by"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -5808,9 +5886,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.sync_ops": {
+    "ukuphila.sync_ops": {
       "name": "sync_ops",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "op_id": {
           "name": "op_id",
@@ -5938,6 +6016,7 @@
             "user_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -5951,6 +6030,7 @@
             "device_id"
           ],
           "tableTo": "devices",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -5964,9 +6044,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.trust_evaluations": {
+    "ukuphila.trust_evaluations": {
       "name": "trust_evaluations",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -6044,6 +6124,7 @@
             "user_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -6057,9 +6138,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.users": {
+    "ukuphila.users": {
       "name": "users",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -6209,14 +6290,14 @@
       "checkConstraints": {
         "users_contact_ck": {
           "name": "users_contact_ck",
-          "value": "\"users\".\"phone\" is not null or \"users\".\"email\" is not null"
+          "value": "\"ukuphila\".\"users\".\"phone\" is not null or \"ukuphila\".\"users\".\"email\" is not null"
         }
       },
       "isRLSEnabled": false
     },
-    "public.visits": {
+    "ukuphila.visits": {
       "name": "visits",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -6294,6 +6375,7 @@
             "agent_id"
           ],
           "tableTo": "agents",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -6307,6 +6389,7 @@
             "business_id"
           ],
           "tableTo": "businesses",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -6320,9 +6403,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.whatsapp_messages": {
+    "ukuphila.whatsapp_messages": {
       "name": "whatsapp_messages",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -6418,7 +6501,7 @@
           "isUnique": true,
           "with": {},
           "method": "btree",
-          "where": "\"whatsapp_messages\".\"provider_id\" is not null",
+          "where": "\"ukuphila\".\"whatsapp_messages\".\"provider_id\" is not null",
           "concurrently": false
         }
       },
@@ -6430,6 +6513,7 @@
             "user_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -6443,9 +6527,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.xitique_contributions": {
+    "ukuphila.xitique_contributions": {
       "name": "xitique_contributions",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -6542,6 +6626,7 @@
             "round_id"
           ],
           "tableTo": "xitique_rounds",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -6555,6 +6640,7 @@
             "member_id"
           ],
           "tableTo": "xitique_members",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -6568,6 +6654,7 @@
             "declared_by"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -6581,6 +6668,7 @@
             "confirmed_by"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -6594,14 +6682,14 @@
       "checkConstraints": {
         "xitique_two_people_ck": {
           "name": "xitique_two_people_ck",
-          "value": "\"xitique_contributions\".\"confirmed_by\" is null or \"xitique_contributions\".\"declared_by\" is null or \"xitique_contributions\".\"confirmed_by\" <> \"xitique_contributions\".\"declared_by\""
+          "value": "\"ukuphila\".\"xitique_contributions\".\"confirmed_by\" is null or \"ukuphila\".\"xitique_contributions\".\"declared_by\" is null or \"ukuphila\".\"xitique_contributions\".\"confirmed_by\" <> \"ukuphila\".\"xitique_contributions\".\"declared_by\""
         }
       },
       "isRLSEnabled": false
     },
-    "public.xitique_events": {
+    "ukuphila.xitique_events": {
       "name": "xitique_events",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -6679,6 +6767,7 @@
             "group_id"
           ],
           "tableTo": "xitique_groups",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -6692,6 +6781,7 @@
             "actor_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -6705,9 +6795,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.xitique_groups": {
+    "ukuphila.xitique_groups": {
       "name": "xitique_groups",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -6807,6 +6897,7 @@
             "created_by"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -6820,6 +6911,7 @@
             "market_id"
           ],
           "tableTo": "markets",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -6841,14 +6933,14 @@
       "checkConstraints": {
         "xitique_contribution_ck": {
           "name": "xitique_contribution_ck",
-          "value": "\"xitique_groups\".\"contribution_cents\" > 0"
+          "value": "\"ukuphila\".\"xitique_groups\".\"contribution_cents\" > 0"
         }
       },
       "isRLSEnabled": false
     },
-    "public.xitique_members": {
+    "ukuphila.xitique_members": {
       "name": "xitique_members",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -6929,7 +7021,7 @@
           "isUnique": true,
           "with": {},
           "method": "btree",
-          "where": "\"xitique_members\".\"user_id\" is not null",
+          "where": "\"ukuphila\".\"xitique_members\".\"user_id\" is not null",
           "concurrently": false
         },
         "xitique_member_position_uq": {
@@ -6951,7 +7043,7 @@
           "isUnique": true,
           "with": {},
           "method": "btree",
-          "where": "\"xitique_members\".\"position\" is not null",
+          "where": "\"ukuphila\".\"xitique_members\".\"position\" is not null",
           "concurrently": false
         },
         "xitique_members_user_idx": {
@@ -6978,6 +7070,7 @@
             "group_id"
           ],
           "tableTo": "xitique_groups",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -6991,6 +7084,7 @@
             "user_id"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -7004,9 +7098,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.xitique_rounds": {
+    "ukuphila.xitique_rounds": {
       "name": "xitique_rounds",
-      "schema": "",
+      "schema": "ukuphila",
       "columns": {
         "id": {
           "name": "id",
@@ -7090,6 +7184,7 @@
             "group_id"
           ],
           "tableTo": "xitique_groups",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -7103,6 +7198,7 @@
             "recipient_member_id"
           ],
           "tableTo": "xitique_members",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -7116,6 +7212,7 @@
             "paid_out_confirmed_by"
           ],
           "tableTo": "users",
+          "schemaTo": "ukuphila",
           "columnsTo": [
             "id"
           ],
@@ -7131,7 +7228,9 @@
     }
   },
   "enums": {},
-  "schemas": {},
+  "schemas": {
+    "ukuphila": "ukuphila"
+  },
   "views": {},
   "sequences": {},
   "roles": {},

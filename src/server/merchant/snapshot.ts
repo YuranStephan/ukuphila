@@ -64,7 +64,7 @@ export async function buildSnapshot(db: Executor, userId: string) {
       .limit(1),
     db.execute(sql`
       select a.code, coalesce(sum(p.amount_cents), 0) as balance
-      from accounts a left join postings p on p.account_id = a.id
+      from ukuphila.accounts a left join ukuphila.postings p on p.account_id = a.id
       where a.user_id = ${userId}
       group by a.code
     `),
@@ -73,9 +73,9 @@ export async function buildSnapshot(db: Executor, userId: string) {
         coalesce(sum(case when e.kind in ('venda','venda_fiado') then e.amount_cents end), 0) as sales,
         coalesce(sum(case when e.kind = 'despesa' then e.amount_cents end), 0) as expenses,
         coalesce(sum(case when e.kind = 'compra_stock' then e.amount_cents end), 0) as purchases
-      from journal_entries e
+      from ukuphila.journal_entries e
       where e.user_id = ${userId} and e.occurred_at >= ${since.toISOString()}::timestamptz
-        and not exists (select 1 from journal_entries r where r.reverses_id = e.id)
+        and not exists (select 1 from ukuphila.journal_entries r where r.reverses_id = e.id)
       group by 1 order by 1
     `),
     db
@@ -105,18 +105,18 @@ export async function buildSnapshot(db: Executor, userId: string) {
         coalesce(sum(case e.kind when 'venda_fiado' then e.amount_cents when 'fiado_recebido' then -e.amount_cents else 0 end), 0) as owed,
         min(e.occurred_at) filter (where e.kind = 'venda_fiado') as oldest,
         max(e.occurred_at) as last_at
-      from customers c
-      left join journal_entries e on e.customer_id = c.id and e.kind <> 'estorno'
-        and not exists (select 1 from journal_entries r where r.reverses_id = e.id)
+      from ukuphila.customers c
+      left join ukuphila.journal_entries e on e.customer_id = c.id and e.kind <> 'estorno'
+        and not exists (select 1 from ukuphila.journal_entries r where r.reverses_id = e.id)
       where c.user_id = ${userId}
       group by c.id order by owed desc, c.name
     `),
     db.execute(sql`
       select g.id, g.name, g.target_cents, g.target_date::text as target_date, g.status,
         coalesce(sum(case e.kind when 'poupanca_deposito' then e.amount_cents when 'poupanca_levantamento' then -e.amount_cents else 0 end), 0) as saved
-      from savings_goals g
-      left join journal_entries e on e.goal_id = g.id and e.kind <> 'estorno'
-        and not exists (select 1 from journal_entries r where r.reverses_id = e.id)
+      from ukuphila.savings_goals g
+      left join ukuphila.journal_entries e on e.goal_id = g.id and e.kind <> 'estorno'
+        and not exists (select 1 from ukuphila.journal_entries r where r.reverses_id = e.id)
       where g.user_id = ${userId}
       group by g.id order by g.created_at
     `),
@@ -165,14 +165,14 @@ export async function buildSnapshot(db: Executor, userId: string) {
         coalesce(sum(case when e.category = 'custo_conhecido' then e.amount_cents end), 0) as known,
         coalesce(sum(e.amount_cents), 0) as revenue,
         coalesce(sum(p.quantity_cost), 0) as cost
-      from journal_entries e
+      from ukuphila.journal_entries e
       left join lateral (
-        select sum(po.amount_cents) as quantity_cost from postings po
-        join accounts a on a.id = po.account_id and a.code = 'custo_vendas'
+        select sum(po.amount_cents) as quantity_cost from ukuphila.postings po
+        join ukuphila.accounts a on a.id = po.account_id and a.code = 'custo_vendas'
         where po.entry_id = e.id
       ) p on true
       where e.user_id = ${userId} and e.kind in ('venda','venda_fiado') and e.occurred_at >= ${daysAgo(30, now).toISOString()}::timestamptz
-        and not exists (select 1 from journal_entries r where r.reverses_id = e.id)
+        and not exists (select 1 from ukuphila.journal_entries r where r.reverses_id = e.id)
     `),
   );
 
@@ -360,9 +360,9 @@ export async function marketPulse(db: Executor, marketId: string, minMerchants: 
     await db.execute(sql`
       select p.market_category as category, count(distinct e.user_id) as merchants,
         round(sum(e.amount_cents)::numeric / nullif(sum(e.quantity), 0)) as avg_price, sum(e.quantity) as units
-      from journal_entries e
-      join products p on p.id = e.product_id
-      join businesses b on b.owner_id = e.user_id
+      from ukuphila.journal_entries e
+      join ukuphila.products p on p.id = e.product_id
+      join ukuphila.businesses b on b.owner_id = e.user_id
       where b.market_id = ${marketId} and e.kind in ('venda','venda_fiado') and e.quantity > 0
         and p.market_category is not null and e.occurred_at >= ${since}::date
       group by p.market_category

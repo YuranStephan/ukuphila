@@ -10,7 +10,7 @@ import {
   index,
   integer,
   jsonb,
-  pgTable,
+  pgSchema,
   primaryKey,
   text,
   timestamp,
@@ -28,13 +28,16 @@ import {
 
 const bytea = customType<{ data: Buffer | Uint8Array; driverData: Buffer | Uint8Array }>({ dataType: () => "bytea" });
 
+/** Own schema, so this database can be shared with other projects without any name clashing. */
+export const ukuphila = pgSchema("ukuphila");
+
 const id = () => uuid("id").primaryKey().defaultRandom();
 const ts = (name: string) => timestamp(name, { withTimezone: true });
 const createdAt = () => ts("created_at").notNull().defaultNow();
 
 // ── Geography ───────────────────────────────────────────────────────────────
 
-export const markets = pgTable("markets", {
+export const markets = ukuphila.table("markets", {
   id: id(),
   slug: text("slug").notNull().unique(),
   name: text("name").notNull(),
@@ -61,7 +64,7 @@ export type Role =
   | "admin"
   | "auditor";
 
-export const users = pgTable(
+export const users = ukuphila.table(
   "users",
   {
     id: id(),
@@ -88,7 +91,7 @@ export const users = pgTable(
   ],
 );
 
-export const sessions = pgTable(
+export const sessions = ukuphila.table(
   "sessions",
   {
     id: id(),
@@ -105,7 +108,7 @@ export const sessions = pgTable(
   (t) => [index("sessions_user_idx").on(t.userId)],
 );
 
-export const otpChallenges = pgTable(
+export const otpChallenges = ukuphila.table(
   "otp_challenges",
   {
     id: id(),
@@ -120,20 +123,20 @@ export const otpChallenges = pgTable(
   (t) => [index("otp_phone_idx").on(t.phone, t.createdAt)],
 );
 
-export const rateLimits = pgTable("rate_limits", {
+export const rateLimits = ukuphila.table("rate_limits", {
   key: text("key").primaryKey(),
   count: integer("count").notNull().default(0),
   windowStart: ts("window_start").notNull().defaultNow(),
 });
 
-export const settings = pgTable("settings", {
+export const settings = ukuphila.table("settings", {
   key: text("key").primaryKey(),
   value: jsonb("value").notNull(),
   updatedAt: ts("updated_at").notNull().defaultNow(),
   updatedBy: uuid("updated_by"),
 });
 
-export const agents = pgTable("agents", {
+export const agents = ukuphila.table("agents", {
   id: id(),
   userId: uuid("user_id").notNull().unique().references(() => users.id),
   code: text("code").notNull().unique(),
@@ -145,7 +148,7 @@ export const agents = pgTable("agents", {
   createdAt: createdAt(),
 });
 
-export const businesses = pgTable(
+export const businesses = ukuphila.table(
   "businesses",
   {
     id: id(),
@@ -166,7 +169,7 @@ export const businesses = pgTable(
 
 // ── KYC, documents, consent ─────────────────────────────────────────────────
 
-export const kycProfiles = pgTable("kyc_profiles", {
+export const kycProfiles = ukuphila.table("kyc_profiles", {
   userId: uuid("user_id").primaryKey().references(() => users.id),
   level: integer("level").notNull().default(0),
   status: text("status").$type<"por_iniciar" | "em_curso" | "verificado" | "em_revisao">().notNull().default("por_iniciar"),
@@ -175,7 +178,7 @@ export const kycProfiles = pgTable("kyc_profiles", {
   updatedBy: uuid("updated_by"),
 });
 
-export const kycEvents = pgTable(
+export const kycEvents = ukuphila.table(
   "kyc_events",
   {
     id: id(),
@@ -190,7 +193,7 @@ export const kycEvents = pgTable(
 );
 
 /** What an agent saw (observado) kept apart from what the person said (declarado). KB §9.3. */
-export const kycAttestations = pgTable(
+export const kycAttestations = ukuphila.table(
   "kyc_attestations",
   {
     id: id(),
@@ -206,7 +209,7 @@ export const kycAttestations = pgTable(
 
 export type DocumentStatus = "pendente" | "submetido" | "em_revisao" | "aprovado" | "rejeitado" | "expirado";
 
-export const documents = pgTable(
+export const documents = ukuphila.table(
   "documents",
   {
     id: id(),
@@ -240,12 +243,12 @@ export const documents = pgTable(
 );
 
 /** Ciphertext only: AES-256-GCM happens in the application, so a database read alone exposes no document. */
-export const documentBlobs = pgTable("document_blobs", {
+export const documentBlobs = ukuphila.table("document_blobs", {
   documentId: uuid("document_id").primaryKey().references(() => documents.id),
   ciphertext: bytea("ciphertext").notNull(),
 });
 
-export const documentEvents = pgTable(
+export const documentEvents = ukuphila.table(
   "document_events",
   {
     id: id(),
@@ -258,7 +261,7 @@ export const documentEvents = pgTable(
   (t) => [index("document_events_doc_idx").on(t.documentId)],
 );
 
-export const consents = pgTable(
+export const consents = ukuphila.table(
   "consents",
   {
     id: id(),
@@ -275,7 +278,7 @@ export const consents = pgTable(
 );
 
 /** "Quem viu os meus dados": every staff or agent read of a merchant's data, shown back to that merchant. */
-export const accessLog = pgTable(
+export const accessLog = ukuphila.table(
   "access_log",
   {
     id: id(),
@@ -305,7 +308,7 @@ export type AccountCode =
   | "divida_fornecedor"
   | "correccoes";
 
-export const accounts = pgTable(
+export const accounts = ukuphila.table(
   "accounts",
   {
     id: id(),
@@ -337,7 +340,7 @@ export type EntryKind =
 
 export type Channel = "app" | "voz" | "whatsapp" | "agente" | "sms" | "sistema";
 
-export const journalEntries = pgTable(
+export const journalEntries = ukuphila.table(
   "journal_entries",
   {
     id: id(),
@@ -373,7 +376,7 @@ export const journalEntries = pgTable(
   ],
 );
 
-export const postings = pgTable(
+export const postings = ukuphila.table(
   "postings",
   {
     id: id(),
@@ -388,7 +391,7 @@ export const postings = pgTable(
   ],
 );
 
-export const entryReviews = pgTable(
+export const entryReviews = ukuphila.table(
   "entry_reviews",
   {
     id: id(),
@@ -403,7 +406,7 @@ export const entryReviews = pgTable(
 
 // ── Business management ─────────────────────────────────────────────────────
 
-export const products = pgTable(
+export const products = ukuphila.table(
   "products",
   {
     id: id(),
@@ -422,7 +425,7 @@ export const products = pgTable(
   (t) => [uniqueIndex("products_user_name_uq").on(t.userId, t.name)],
 );
 
-export const stockMoves = pgTable(
+export const stockMoves = ukuphila.table(
   "stock_moves",
   {
     id: id(),
@@ -438,7 +441,7 @@ export const stockMoves = pgTable(
   (t) => [index("stock_moves_product_idx").on(t.productId, t.createdAt)],
 );
 
-export const customers = pgTable(
+export const customers = ukuphila.table(
   "customers",
   {
     id: id(),
@@ -451,7 +454,7 @@ export const customers = pgTable(
   (t) => [uniqueIndex("customers_user_name_uq").on(t.userId, t.name)],
 );
 
-export const savingsGoals = pgTable(
+export const savingsGoals = ukuphila.table(
   "savings_goals",
   {
     id: id(),
@@ -467,7 +470,7 @@ export const savingsGoals = pgTable(
 
 // ── Xitique ─────────────────────────────────────────────────────────────────
 
-export const xitiqueGroups = pgTable(
+export const xitiqueGroups = ukuphila.table(
   "xitique_groups",
   {
     id: id(),
@@ -488,7 +491,7 @@ export const xitiqueGroups = pgTable(
   (t) => [check("xitique_contribution_ck", sql`${t.contributionCents} > 0`)],
 );
 
-export const xitiqueMembers = pgTable(
+export const xitiqueMembers = ukuphila.table(
   "xitique_members",
   {
     id: id(),
@@ -508,7 +511,7 @@ export const xitiqueMembers = pgTable(
   ],
 );
 
-export const xitiqueRounds = pgTable(
+export const xitiqueRounds = ukuphila.table(
   "xitique_rounds",
   {
     id: id(),
@@ -523,7 +526,7 @@ export const xitiqueRounds = pgTable(
   (t) => [uniqueIndex("xitique_round_uq").on(t.groupId, t.number)],
 );
 
-export const xitiqueContributions = pgTable(
+export const xitiqueContributions = ukuphila.table(
   "xitique_contributions",
   {
     id: id(),
@@ -543,7 +546,7 @@ export const xitiqueContributions = pgTable(
   ],
 );
 
-export const xitiqueEvents = pgTable(
+export const xitiqueEvents = ukuphila.table(
   "xitique_events",
   {
     id: id(),
@@ -559,7 +562,7 @@ export const xitiqueEvents = pgTable(
 
 // ── Supplier credit ─────────────────────────────────────────────────────────
 
-export const suppliers = pgTable("suppliers", {
+export const suppliers = ukuphila.table("suppliers", {
   id: id(),
   ownerId: uuid("owner_id").unique().references(() => users.id),
   name: text("name").notNull(),
@@ -570,7 +573,7 @@ export const suppliers = pgTable("suppliers", {
   createdAt: createdAt(),
 });
 
-export const supplierProducts = pgTable(
+export const supplierProducts = ukuphila.table(
   "supplier_products",
   {
     id: id(),
@@ -593,7 +596,7 @@ export type CreditPolicyParams = {
   concentrationLimitPct: number;
 };
 
-export const creditPolicies = pgTable(
+export const creditPolicies = ukuphila.table(
   "credit_policies",
   {
     id: id(),
@@ -622,7 +625,7 @@ export type ApplicationStatus =
   | "desistido"
   | "expirado";
 
-export const creditApplications = pgTable(
+export const creditApplications = ukuphila.table(
   "credit_applications",
   {
     id: id(),
@@ -648,7 +651,7 @@ export const creditApplications = pgTable(
   ],
 );
 
-export const creditDecisions = pgTable(
+export const creditDecisions = ukuphila.table(
   "credit_decisions",
   {
     id: id(),
@@ -665,7 +668,7 @@ export const creditDecisions = pgTable(
 
 export type ContractStatus = "aguarda_entrega" | "activo" | "em_atraso" | "incumprimento" | "liquidado" | "cancelado";
 
-export const creditContracts = pgTable(
+export const creditContracts = ukuphila.table(
   "credit_contracts",
   {
     id: id(),
@@ -689,7 +692,7 @@ export const creditContracts = pgTable(
   (t) => [index("credit_contract_user_idx").on(t.userId), index("credit_contract_status_idx").on(t.status)],
 );
 
-export const creditInstalments = pgTable(
+export const creditInstalments = ukuphila.table(
   "credit_instalments",
   {
     id: id(),
@@ -708,7 +711,7 @@ export const creditInstalments = pgTable(
   ],
 );
 
-export const creditRepayments = pgTable(
+export const creditRepayments = ukuphila.table(
   "credit_repayments",
   {
     id: id(),
@@ -725,7 +728,7 @@ export const creditRepayments = pgTable(
 
 // ── Trust: explainable readiness ────────────────────────────────────────────
 
-export const trustEvaluations = pgTable(
+export const trustEvaluations = ukuphila.table(
   "trust_evaluations",
   {
     id: id(),
@@ -739,7 +742,7 @@ export const trustEvaluations = pgTable(
   (t) => [index("trust_eval_user_idx").on(t.userId, t.createdAt)],
 );
 
-export const passports = pgTable(
+export const passports = ukuphila.table(
   "passports",
   {
     id: id(),
@@ -759,7 +762,7 @@ export const passports = pgTable(
 
 // ── Devices, leasing, offline sync ──────────────────────────────────────────
 
-export const deviceModels = pgTable("device_models", {
+export const deviceModels = ukuphila.table("device_models", {
   id: id(),
   name: text("name").notNull(),
   priceCents: bigint("price_cents", { mode: "number" }).notNull(),
@@ -767,7 +770,7 @@ export const deviceModels = pgTable("device_models", {
   active: boolean("active").notNull().default(true),
 });
 
-export const devices = pgTable(
+export const devices = ukuphila.table(
   "devices",
   {
     id: id(),
@@ -786,7 +789,7 @@ export const devices = pgTable(
   (t) => [index("devices_user_idx").on(t.userId)],
 );
 
-export const deviceLeases = pgTable(
+export const deviceLeases = ukuphila.table(
   "device_leases",
   {
     id: id(),
@@ -804,7 +807,7 @@ export const deviceLeases = pgTable(
   (t) => [index("device_leases_user_idx").on(t.userId)],
 );
 
-export const leasePayments = pgTable(
+export const leasePayments = ukuphila.table(
   "lease_payments",
   {
     id: id(),
@@ -821,7 +824,7 @@ export const leasePayments = pgTable(
 
 export type SyncOpStatus = "applied" | "duplicate" | "conflict" | "rejected";
 
-export const syncOps = pgTable(
+export const syncOps = ukuphila.table(
   "sync_ops",
   {
     opId: uuid("op_id").primaryKey(),
@@ -841,7 +844,7 @@ export const syncOps = pgTable(
   (t) => [index("sync_ops_user_idx").on(t.userId, t.receivedAt), index("sync_ops_status_idx").on(t.status)],
 );
 
-export const syncConflicts = pgTable(
+export const syncConflicts = ukuphila.table(
   "sync_conflicts",
   {
     id: id(),
@@ -860,7 +863,7 @@ export const syncConflicts = pgTable(
 
 // ── Field operations ────────────────────────────────────────────────────────
 
-export const visits = pgTable(
+export const visits = ukuphila.table(
   "visits",
   {
     id: id(),
@@ -876,7 +879,7 @@ export const visits = pgTable(
 
 export type IncidentKind = "suporte" | "tecnico" | "fraude" | "documento" | "dispositivo" | "sync" | "reclamacao";
 
-export const incidents = pgTable(
+export const incidents = ukuphila.table(
   "incidents",
   {
     id: id(),
@@ -897,7 +900,7 @@ export const incidents = pgTable(
   (t) => [index("incidents_status_idx").on(t.status), index("incidents_subject_idx").on(t.subjectUserId)],
 );
 
-export const agentEarnings = pgTable(
+export const agentEarnings = ukuphila.table(
   "agent_earnings",
   {
     id: id(),
@@ -911,7 +914,7 @@ export const agentEarnings = pgTable(
   (t) => [index("agent_earnings_idx").on(t.agentId, t.createdAt)],
 );
 
-export const notifications = pgTable(
+export const notifications = ukuphila.table(
   "notifications",
   {
     id: id(),
@@ -927,7 +930,7 @@ export const notifications = pgTable(
   (t) => [index("notifications_user_idx").on(t.userId, t.createdAt)],
 );
 
-export const auditEvents = pgTable(
+export const auditEvents = ukuphila.table(
   "audit_events",
   {
     seq: bigserial("seq", { mode: "number" }).primaryKey(),
@@ -951,7 +954,7 @@ export const auditEvents = pgTable(
 
 // ── AI and channels ─────────────────────────────────────────────────────────
 
-export const proposals = pgTable(
+export const proposals = ukuphila.table(
   "proposals",
   {
     id: id(),
@@ -970,7 +973,7 @@ export const proposals = pgTable(
   (t) => [index("proposals_user_idx").on(t.userId, t.status)],
 );
 
-export const aiTurns = pgTable(
+export const aiTurns = ukuphila.table(
   "ai_turns",
   {
     id: id(),
@@ -990,7 +993,7 @@ export const aiTurns = pgTable(
   (t) => [index("ai_turns_time_idx").on(t.createdAt), index("ai_turns_user_idx").on(t.userId)],
 );
 
-export const whatsappMessages = pgTable(
+export const whatsappMessages = ukuphila.table(
   "whatsapp_messages",
   {
     id: id(),
@@ -1009,7 +1012,7 @@ export const whatsappMessages = pgTable(
   ],
 );
 
-export const kbDocuments = pgTable("kb_documents", {
+export const kbDocuments = ukuphila.table("kb_documents", {
   id: text("id").primaryKey(),
   title: text("title").notNull(),
   domain: text("domain").notNull(),
@@ -1028,7 +1031,7 @@ export const kbDocuments = pgTable("kb_documents", {
   updatedAt: ts("updated_at").notNull().defaultNow(),
 });
 
-export const kbChunks = pgTable(
+export const kbChunks = ukuphila.table(
   "kb_chunks",
   {
     id: id(),
@@ -1044,7 +1047,7 @@ export const kbChunks = pgTable(
 
 export type AlertSeverity = "baixa" | "media" | "alta" | "critica";
 
-export const riskCases = pgTable(
+export const riskCases = ukuphila.table(
   "risk_cases",
   {
     id: id(),
@@ -1063,7 +1066,7 @@ export const riskCases = pgTable(
   (t) => [index("risk_cases_status_idx").on(t.status)],
 );
 
-export const riskCaseNotes = pgTable(
+export const riskCaseNotes = ukuphila.table(
   "risk_case_notes",
   {
     id: id(),
@@ -1075,7 +1078,7 @@ export const riskCaseNotes = pgTable(
   (t) => [index("risk_case_notes_idx").on(t.caseId)],
 );
 
-export const riskAlerts = pgTable(
+export const riskAlerts = ukuphila.table(
   "risk_alerts",
   {
     id: id(),
@@ -1099,7 +1102,7 @@ export const riskAlerts = pgTable(
 
 // ── Programme governance ────────────────────────────────────────────────────
 
-export const readinessItems = pgTable("readiness_items", {
+export const readinessItems = ukuphila.table("readiness_items", {
   id: id(),
   position: integer("position").notNull(),
   area: text("area").notNull(),
@@ -1111,7 +1114,7 @@ export const readinessItems = pgTable("readiness_items", {
   updatedBy: uuid("updated_by"),
 });
 
-export const leads = pgTable(
+export const leads = ukuphila.table(
   "leads",
   {
     id: id(),
@@ -1129,7 +1132,7 @@ export const leads = pgTable(
 );
 
 // Composite key kept out of the main list above for readability.
-export const readReceipts = pgTable(
+export const readReceipts = ukuphila.table(
   "read_receipts",
   {
     userId: uuid("user_id").notNull(),

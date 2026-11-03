@@ -20,7 +20,7 @@ export async function runRiskRules(db: Db) {
     await db.execute(sql`
       with daily as (
         select user_id, (occurred_at at time zone 'Africa/Maputo')::date as day, sum(amount_cents) as total
-        from journal_entries where kind in ('venda','venda_fiado') and occurred_at >= ${daysAgo(35).toISOString()}::timestamptz
+        from ukuphila.journal_entries where kind in ('venda','venda_fiado') and occurred_at >= ${daysAgo(35).toISOString()}::timestamptz
         group by 1, 2
       ), normal as (
         select user_id, percentile_cont(0.5) within group (order by total) as median, count(*) as days from daily group by 1
@@ -47,7 +47,7 @@ export async function runRiskRules(db: Db) {
   const agents = rowsOf<{ recorded_by: string; name: string; reversals: string }>(
     await db.execute(sql`
       select e.recorded_by, u.display_name as name, count(*) as reversals
-      from journal_entries e join users u on u.id = e.recorded_by
+      from ukuphila.journal_entries e join ukuphila.users u on u.id = e.recorded_by
       where e.kind = 'estorno' and u.role = 'agent' and e.recorded_at >= ${daysAgo(14).toISOString()}::timestamptz
       group by 1, 2 having count(*) >= 8
     `),
@@ -86,7 +86,7 @@ export async function runRiskRules(db: Db) {
   // Merchants who were regular and went silent. Usually an agent visit solves it, so this is an operations signal.
   const silent = rowsOf<{ user_id: string; last_day: string }>(
     await db.execute(sql`
-      select user_id, max(occurred_at)::date::text as last_day from journal_entries
+      select user_id, max(occurred_at)::date::text as last_day from ukuphila.journal_entries
       group by 1
       having max(occurred_at) < ${daysAgo(14).toISOString()}::timestamptz and max(occurred_at) >= ${daysAgo(45).toISOString()}::timestamptz and count(*) > 30
     `),

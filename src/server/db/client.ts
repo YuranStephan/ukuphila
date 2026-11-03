@@ -12,6 +12,9 @@ export type Executor = Db | Tx;
 
 const migrationsFolder = () => path.join(process.cwd(), "drizzle");
 
+/** The migration log lives with the tables, never in a shared default location. */
+const migrationConfig = () => ({ migrationsFolder: migrationsFolder(), migrationsTable: "__migrations", migrationsSchema: "ukuphila" });
+
 /** In-process PostgreSQL (PGlite). `dataDir` undefined → memory only (tests). */
 export async function openPglite(dataDir?: string): Promise<{ db: Db; close: () => Promise<void> }> {
   const { PGlite } = await import("@electric-sql/pglite");
@@ -21,7 +24,7 @@ export async function openPglite(dataDir?: string): Promise<{ db: Db; close: () 
   const client = dataDir ? new PGlite(dataDir) : new PGlite();
   await client.waitReady;
   const pglite = drizzle(client, { schema });
-  await migrate(pglite, { migrationsFolder: migrationsFolder() });
+  await migrate(pglite, migrationConfig());
   return { db: pglite as unknown as Db, close: () => client.close() };
 }
 
@@ -67,7 +70,7 @@ export async function migratePostgres(url: string) {
   const { migrate } = await import("drizzle-orm/node-postgres/migrator");
   const pool = new Pool({ connectionString: url, max: 1, ssl: tlsOptions() });
   try {
-    await migrate(drizzle(pool), { migrationsFolder: migrationsFolder() });
+    await migrate(drizzle(pool), migrationConfig());
   } finally {
     await pool.end();
   }

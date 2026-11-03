@@ -73,15 +73,15 @@ export async function buildRonda(db: Executor, agentId: string): Promise<RondaIt
   }>(
     await db.execute(sql`
       select u.id, u.display_name as name, b.name as business, b.stall, u.status, coalesce(k.level, 0) as level, b.onboarded_at as onboarded,
-        (select max(e.occurred_at) from journal_entries e where e.user_id = u.id) as last_at,
-        (select count(*) from documents d where d.user_id = u.id and d.status = 'rejeitado'
-          and not exists (select 1 from documents n where n.supersedes_id = d.id)) as rejected,
-        (select count(*) from documents d where d.user_id = u.id and d.status in ('submetido','em_revisao')) as pending_docs,
-        (select count(*) from sync_conflicts c where c.user_id = u.id and c.status = 'aberto') as conflicts,
-        (select count(*) from credit_contracts c where c.user_id = u.id and c.status in ('em_atraso','incumprimento')) as late_credit,
-        (select count(*) from incidents i where i.subject_user_id = u.id and i.status <> 'resolvido') as open_incidents,
-        (select count(*) from lease_payments p join device_leases l on l.id = p.lease_id where l.user_id = u.id and p.status = 'em_atraso') as late_lease
-      from businesses b join users u on u.id = b.owner_id left join kyc_profiles k on k.user_id = u.id
+        (select max(e.occurred_at) from ukuphila.journal_entries e where e.user_id = u.id) as last_at,
+        (select count(*) from ukuphila.documents d where d.user_id = u.id and d.status = 'rejeitado'
+          and not exists (select 1 from ukuphila.documents n where n.supersedes_id = d.id)) as rejected,
+        (select count(*) from ukuphila.documents d where d.user_id = u.id and d.status in ('submetido','em_revisao')) as pending_docs,
+        (select count(*) from ukuphila.sync_conflicts c where c.user_id = u.id and c.status = 'aberto') as conflicts,
+        (select count(*) from ukuphila.credit_contracts c where c.user_id = u.id and c.status in ('em_atraso','incumprimento')) as late_credit,
+        (select count(*) from ukuphila.incidents i where i.subject_user_id = u.id and i.status <> 'resolvido') as open_incidents,
+        (select count(*) from ukuphila.lease_payments p join ukuphila.device_leases l on l.id = p.lease_id where l.user_id = u.id and p.status = 'em_atraso') as late_lease
+      from ukuphila.businesses b join ukuphila.users u on u.id = b.owner_id left join ukuphila.kyc_profiles k on k.user_id = u.id
       where b.agent_id = ${agentId}
     `),
   );
@@ -105,9 +105,9 @@ export async function agentPortfolio(db: Executor, agentId: string) {
   const rows = rowsOf<{ id: string; name: string; business: string; stall: string | null; activity: string; level: number; status: string; last_at: string | null; entries30: string }>(
     await db.execute(sql`
       select u.id, u.display_name as name, b.name as business, b.stall, b.activity, coalesce(k.level, 0) as level, u.status,
-        (select max(e.occurred_at) from journal_entries e where e.user_id = u.id) as last_at,
-        (select count(*) from journal_entries e where e.user_id = u.id and e.occurred_at >= ${daysAgo(30).toISOString()}::timestamptz) as entries30
-      from businesses b join users u on u.id = b.owner_id left join kyc_profiles k on k.user_id = u.id
+        (select max(e.occurred_at) from ukuphila.journal_entries e where e.user_id = u.id) as last_at,
+        (select count(*) from ukuphila.journal_entries e where e.user_id = u.id and e.occurred_at >= ${daysAgo(30).toISOString()}::timestamptz) as entries30
+      from ukuphila.businesses b join ukuphila.users u on u.id = b.owner_id left join ukuphila.kyc_profiles k on k.user_id = u.id
       where b.agent_id = ${agentId} order by u.display_name
     `),
   );
