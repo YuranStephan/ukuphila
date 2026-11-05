@@ -277,7 +277,8 @@
   color: var(--text-2);
 }
 
-.tabs-row a[aria-current="true"] {
+.tabs-row a[aria-current="true"],
+.tabs-row a[aria-current="page"] {
   background: var(--tinta);
   border-color: var(--tinta);
   color: var(--cal);

@@ -134,9 +134,9 @@ export async function marketBreakdown(db: Executor) {
 }
 
 export async function agentPerformance(db: Executor) {
-  const rows = rowsOf<{ id: string; code: string; name: string; market: string; status: string; merchants: string; active: string; visits: string; open_incidents: string; earned: string }>(
+  const rows = rowsOf<{ id: string; user_id: string; phone: string | null; code: string; name: string; market: string; status: string; merchants: string; active: string; visits: string; open_incidents: string; earned: string }>(
     await db.execute(sql`
-      select a.id, a.code, u.display_name as name, m.name as market, a.status,
+      select a.id, a.user_id, u.phone, a.code, u.display_name as name, m.name as market, a.status,
         (select count(*) from ukuphila.businesses b where b.agent_id = a.id) as merchants,
         (select count(distinct e.user_id) from ukuphila.journal_entries e join ukuphila.businesses b on b.owner_id = e.user_id
           where b.agent_id = a.id and e.occurred_at >= ${daysAgo(7).toISOString()}::timestamptz) as active,
@@ -147,7 +147,7 @@ export async function agentPerformance(db: Executor) {
       order by merchants desc
     `),
   );
-  return rows.map((row) => ({ id: row.id, code: row.code, name: row.name, market: row.market, status: row.status, merchants: Number(row.merchants), active: Number(row.active), visits: Number(row.visits), openIncidents: Number(row.open_incidents), earnedCents: Number(row.earned) }));
+  return rows.map((row) => ({ id: row.id, userId: row.user_id, phone: row.phone, code: row.code, name: row.name, market: row.market, status: row.status, merchants: Number(row.merchants), active: Number(row.active), visits: Number(row.visits), openIncidents: Number(row.open_incidents), earnedCents: Number(row.earned) }));
 }
 
 /** Portfolio view for the risk room. PAR counts the whole outstanding balance of a contract once it is late. */
@@ -213,8 +213,8 @@ export async function repaymentStats(db: Executor) {
   const [row] = rowsOf<{ due: string; on_time: string; settled: string; collected: string }>(
     await db.execute(sql`
       select
-        count(*) filter (where i.due_date <= current_date) as due,
-        count(*) filter (where i.status = 'pago' and (i.paid_at at time zone 'Africa/Maputo')::date <= i.due_date) as on_time,
+        count(*) filter (where i.due_date <= ${maputoDay()}::date) as due,
+        count(*) filter (where i.due_date <= ${maputoDay()}::date and i.status = 'pago' and (i.paid_at at time zone 'Africa/Maputo')::date <= i.due_date) as on_time,
         (select count(*) from ukuphila.credit_contracts where status = 'liquidado') as settled,
         (select coalesce(sum(amount_cents), 0) from ukuphila.credit_repayments) as collected
       from ukuphila.credit_instalments i
@@ -228,7 +228,9 @@ export async function riskOverview(db: Executor) {
     db.select({ severity: riskAlerts.severity, status: riskAlerts.status, total: sql<string>`count(*)` }).from(riskAlerts).groupBy(riskAlerts.severity, riskAlerts.status),
     db.select({ status: riskCases.status, total: sql<string>`count(*)` }).from(riskCases).groupBy(riskCases.status),
   ]);
-  const openBy = (severity: string) => Number(alerts.find((row) => row.severity === severity && row.status !== "fechado")?.total ?? 0);
+  const openBy = (severity: string) => alerts
+    .filter((row) => row.severity === severity && row.status !== "fechado")
+    .reduce((total, row) => total + Number(row.total), 0);
   return {
     critical: openBy("critica"),
     high: openBy("alta"),

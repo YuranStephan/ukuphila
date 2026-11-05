@@ -1,0 +1,7 @@
+CX2 implementada em `/risco` e `/fornecedor`, apenas nos ficheiros autorizados.
+
+TypeScript sem erros. Testes: 136 passaram, 5 falhas esperadas e 1 pendente. Sem build nem validação visual.
+
+Relatório com limites e pedidos ao Claude: [CX2.md](<C:/Users/Dell's/ukuphila/docs/codex/CX2.md>).
+
+Não arranquei servidores, executei scripts de base de dados ou fiz commits.

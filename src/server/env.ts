@@ -3,7 +3,7 @@ import "server-only";
 export const isProduction = () => process.env.NODE_ENV === "production";
 
 /** Demo mode shows personas and synthetic data. It is an explicit switch, never inferred from the environment. */
-export const isDemo = () => process.env.UKUPHILA_DEMO === "1";
+export const isDemo = () => !isProduction() && process.env.UKUPHILA_DEMO === "1";
 
 export function appUrl() {
   return (process.env.APP_URL ?? "http://localhost:3200").replace(/\/$/, "");

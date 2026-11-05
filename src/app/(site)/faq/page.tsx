@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: "Perguntas frequentes" };
 const FAQ = [
   ["O que é o Ukuphila?", "É um acompanhante de negócio criado para ajudar comerciantes informais a organizar o negócio e construir uma relação financeira gradual."],
   ["Preciso de crédito para começar?", "Não. Começas pela gestão do negócio, pela poupança e pela construção de historial. O crédito só aparece muito mais tarde, se fizer sentido."],
-  ["O Ukuphila guarda o meu dinheiro?", "Não. Nesta fase, o Ukuphila regista o que acontece no teu negócio. O dinheiro continua contigo, em mão, na carteira móvel ou no banco."],
+  ["Como são calculados os meus saldos?", "Os saldos resultam dos movimentos da tua conta. Podes consultar o historial e acompanhar o negócio, a casa e a poupança em bolsos separados."],
   ["O que é o Xitique digital?", "É o registo do teu grupo de poupança: quem pagou, quem recebe e o que mudou. O grupo continua a ser vosso."],
   ["Por que existe um agente?", "Porque a confiança e a ajuda de uma pessoa fazem parte do modelo. Há coisas que uma aplicação não resolve."],
   ["Funciona sem internet?", "Sim, para o dia-a-dia: vendas, despesas, stock, fiado e poupança. Algumas coisas exigem rede, como aceitar um contrato ou submeter um documento."],

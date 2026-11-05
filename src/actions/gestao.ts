@@ -3,7 +3,7 @@
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { resolveIncident } from "@/server/agent/service";
+import { assertAgentScope, resolveIncident } from "@/server/agent/service";
 import { recordAudit, verifyAuditChain } from "@/server/audit";
 import { requireApi } from "@/server/auth/session";
 import { generateTotpSecret, hashSecret, randomToken, sealText } from "@/server/crypto";
@@ -40,6 +40,9 @@ export async function resolveConflictAction(conflictId: string, _: ActionState, 
   return run(async () => {
     const user = await requireApi(["admin", "agent"]);
     const db = await getDb();
+    const [conflict] = await db.select({ userId: syncConflicts.userId }).from(syncConflicts).where(eq(syncConflicts.id, conflictId)).limit(1);
+    if (!conflict) throw new DomainError("conflito", "Registo não encontrado.");
+    await assertAgentScope(db, user, conflict.userId);
     await db
       .update(syncConflicts)
       .set({ status: "resolvido", resolvedBy: user.id, resolvedAt: new Date(), resolution: String(form.get("resolution") ?? "Confirmado com o comerciante.") })

@@ -78,7 +78,7 @@ export default async function EntriesPage({ searchParams }: { searchParams: Prom
           </table>
         </div>
       </section>
-      <DataNote>O Ukuphila regista o que os comerciantes declaram. Estes valores não representam dinheiro à guarda da plataforma.</DataNote>
+      <DataNote>Consulta os movimentos declarados pelos comerciantes e o historial de cada registo.</DataNote>
     </>
   );
 }

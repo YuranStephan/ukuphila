@@ -1,5 +1,5 @@
 import { Rings } from "@/components/brand";
-import { Badge, ExampleTag, SectionTitle } from "@/components/ui";
+import { Badge, SectionTitle } from "@/components/ui";
 import { formatDateTime, formatDay, relativeTime } from "@/lib/dates";
 import { CONSENT_PURPOSES, CONTRACT_LABELS, DOCUMENT_STATUS_LABELS, DOCUMENT_TYPES, ENTRY_LABELS, KYC_LEVEL_LABELS, POCKET_LABELS } from "@/lib/labels";
 import { formatMT } from "@/lib/money";
@@ -11,7 +11,7 @@ type Dossier = NonNullable<Awaited<ReturnType<typeof merchantDossier>>>;
 export function TrustPanel({ trust }: { trust: Dossier["trust"] }) {
   return (
     <section className="card">
-      <SectionTitle title="Sinais de confiança" action={trust.isExamplePolicy ? <ExampleTag>Regras de exemplo</ExampleTag> : null} />
+      <SectionTitle title="Sinais de confiança"  />
       <div className="row" style={{ ["--gap" as string]: "16px", alignItems: "flex-start", flexWrap: "wrap" }}>
         <Rings ring={trust.ring} size={118} />
         <div className="grow" style={{ minWidth: 200 }}>

@@ -26,7 +26,7 @@ export default async function SuppliersAdminPage() {
   const byId = new Map(rowsOf<{ id: string; products: string; contracts: string; volume: string; outstanding: string }>(stats).map((row) => [row.id, row]));
   return (
     <>
-      <PageHead eyebrow="Pessoas" title="Fornecedores" lead="Parceiros do crédito fornecedor. Nomes fictícios neste cenário." />
+      <PageHead eyebrow="Pessoas" title="Fornecedores" lead="Parceiros do crédito fornecedor e o que cada um tem em curso." />
       <section className="card card-flush">
         <div className="table-wrap">
           <table className="table">

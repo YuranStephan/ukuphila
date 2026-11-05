@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { LogoMark, Rings, WovenRings, XitiqueCircle } from "@/components/brand";
+import { LogoMark, Rings, WovenRings } from "@/components/brand";
 import { Icon, type IconName } from "@/components/icon";
 import { VoiceDemo } from "@/components/site/voice-demo";
+import { XitiqueStory } from "@/components/site/xitique-story";
+import { AgentMarketPhoto } from "@/components/site/agent-market-photo";
 import { FACTS, SOURCES } from "@/lib/market-facts";
-import { isDemo } from "@/server/env";
 
 const STEPS: { ring: number; name: string; verb: string; body: string; points: string[] }[] = [
   { ring: 1, name: "Caixa", verb: "Ver", body: "Vendas, compras, despesas e fiado em linguagem de banca. Falas, confirmas, fica registado.", points: ["Quanto vendi hoje", "Quanto me devem", "O que está a acabar"] },
@@ -20,7 +21,6 @@ const TRUST: { icon: IconName; title: string; body: string }[] = [
 ];
 
 export default function HomePage() {
-  const demo = isDemo();
   return (
     <>
       <section className="hero" data-surface="noite">
@@ -40,8 +40,8 @@ export default function HomePage() {
               O Ukuphila dá a cada comerciante a memória do seu negócio: caixa, stock, fiado, poupança e Xitique, com um agente de confiança na banca ao lado. O crédito vem depois, como consequência.
             </p>
             <div className="hero-actions rise" style={{ animationDelay: "340ms" }}>
-              <Link className="btn btn-sun" href={demo ? "/demo" : "/contacto"}>
-                {demo ? "Ver a demonstração" : "Falar connosco"} <Icon name="arrowRight" size={18} />
+              <Link className="btn btn-sun" href="/registar">
+                Começar o meu negócio <Icon name="arrowRight" size={18} />
               </Link>
               <Link className="btn btn-ghost" href="/pitch">
                 Ver a apresentação
@@ -122,9 +122,9 @@ export default function HomePage() {
             <p className="eyebrow">Experimenta agora</p>
             <h2 className="section-heading">Fala como falas na banca.</h2>
             <p className="section-lead">
-              Sem menus nem contabilidade. Diz o que aconteceu e o Ukuphila prepara o registo para tu confirmares. Este intérprete está a correr no teu navegador, sem internet, tal como no telefone do comerciante.
+              Uma venda, uma despesa, uma ideia para o futuro. Diz o que aconteceu e o Ukuphila organiza. Tu vês os detalhes, confirmas e continuas o teu dia.
             </p>
-            <p className="small muted">Escreve na caixa ao lado. Experimenta números por extenso, como “mil e quinhentos”.</p>
+            <p className="small muted">Explora os cartões ou escreve à tua maneira. Até “mil e quinhentos” faz sentido aqui.</p>
           </div>
           <VoiceDemo />
         </div>
@@ -154,24 +154,21 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section className="section agent-feature">
+        <div className="container agent-feature-grid">
+          <AgentMarketPhoto />
+          <div className="agent-feature-copy">
+            <p className="eyebrow">No mercado, contigo</p>
+            <h2 className="section-heading">Uma pessoa.<br />Do teu lado.</h2>
+            <p className="section-lead">Do primeiro registo às dúvidas do dia a dia, há alguém que conhece o teu mercado. O agente ensina, acompanha e ajuda-te a seguir em frente.</p>
+            <Link className="link" href="/agentes">Conhece os agentes <Icon name="arrowRight" size={17} /></Link>
+          </div>
+        </div>
+      </section>
+
       <section className="section xitique-section" data-surface="noite">
         <div className="container split reverse">
-          <div className="xitique-visual">
-            <XitiqueCircle
-              size={320}
-              recipient={2}
-              members={[
-                { name: "Celeste Machava", state: "confirmada" },
-                { name: "Lurdes Sitoe", state: "confirmada" },
-                { name: "Teresa Bila", state: "confirmada" },
-                { name: "Júlia Tembe", state: "declarada" },
-                { name: "Marta Langa", state: "confirmada" },
-                { name: "Zita Nhaca", state: "pendente" },
-                { name: "Rute Novela", state: "confirmada" },
-                { name: "Filomena Cossa", state: "declarada" },
-              ]}
-            />
-          </div>
+          <XitiqueStory />
           <div>
             <p className="eyebrow">Xitique digital</p>
             <h2 className="section-heading">Não inventámos o Xitique. Demos-lhe memória.</h2>
@@ -222,7 +219,7 @@ export default function HomePage() {
                 <dd>1 compra liquidada</dd>
               </div>
             </dl>
-            <p className="tiny muted">Exemplo ilustrativo. Código verificável por QR e assinado pelo Ukuphila.</p>
+            <p className="tiny muted">Cada passaporte tem código e QR, e é assinado pelo Ukuphila.</p>
           </div>
         </div>
       </section>

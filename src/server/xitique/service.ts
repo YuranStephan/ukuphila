@@ -1,4 +1,5 @@
 import "server-only";
+import { mayConfirmContribution } from "@/lib/xitique";
 import { and, asc, desc, eq, inArray, lt, sql } from "drizzle-orm";
 import { addDays, maputoDay } from "@/lib/dates";
 import { formatMT } from "@/lib/money";
@@ -142,7 +143,7 @@ export async function declareContribution(tx: Tx, ctx: OperationContext, input: 
     .innerJoin(xitiqueMembers, eq(xitiqueMembers.id, xitiqueContributions.memberId))
     .innerJoin(xitiqueRounds, eq(xitiqueRounds.id, xitiqueContributions.roundId))
     .where(eq(xitiqueContributions.id, input.contributionId))
-    .for("update", { of: xitiqueContributions });
+    .for("update");
   if (!row) throw new DomainError("xitique_contribuicao", "Contribuição não encontrada.");
   const self = row.member.userId === ctx.userId;
   if (!self) {
@@ -188,31 +189,36 @@ export async function confirmContribution(db: Db, actor: Actor, contributionId: 
       .innerJoin(xitiqueMembers, eq(xitiqueMembers.id, xitiqueContributions.memberId))
       .innerJoin(xitiqueRounds, eq(xitiqueRounds.id, xitiqueContributions.roundId))
       .where(eq(xitiqueContributions.id, contributionId))
-      .for("update", { of: xitiqueContributions });
+      .for("update");
     if (!row) throw new DomainError("xitique_contribuicao", "Contribuição não encontrada.");
     const actorMember = await requireMember(tx, row.round.groupId, actor.id);
-    const isRecipient = row.round.recipientMemberId === actorMember.id;
-    if (actorMember.role !== "tesoureiro" && !isRecipient) throw new DomainError("xitique_acesso", "Só quem gere o grupo ou quem recebe nesta ronda pode confirmar.");
+    // The manager or this round's recipient confirms, never the person who declared. If that leaves nobody (the only
+    // manager declared for the round they receive themselves), any other member may confirm, so a second person exists.
     if (row.contribution.status !== "declarada") throw new DomainError("xitique_estado", "Esta contribuição ainda não foi declarada.");
     if (row.contribution.declaredBy === actor.id) throw new DomainError("xitique_duas_pessoas", "A confirmação tem de vir de outra pessoa.");
+    const members = await tx.select().from(xitiqueMembers).where(eq(xitiqueMembers.groupId, row.round.groupId));
+    if (!mayConfirmContribution(members, actor.id, row.round.recipientMemberId, row.contribution.declaredBy)) throw new DomainError("xitique_acesso", "Só quem gere o grupo ou quem recebe nesta ronda pode confirmar.");
     await tx.update(xitiqueContributions).set({ status: "confirmada", confirmedAt: new Date(), confirmedBy: actor.id }).where(eq(xitiqueContributions.id, contributionId));
     await logEvent(tx, row.round.groupId, "contribuicao_confirmada", actor.id, `${actor.displayName} confirmou a contribuição de ${row.member.displayName} na ronda ${row.round.number}.`);
   });
 }
 
 /** The recipient confirms receipt. This is what closes a round and posts the pot to their books. */
-export async function confirmPayout(db: Db, actor: Actor, roundId: string) {
+export async function confirmPayout(db: Db, actor: Actor, roundId: string, input: { receiptNote?: string } = {}) {
   await db.transaction(async (rawTx) => {
     const tx = rawTx as Tx;
     const [round] = await tx.select().from(xitiqueRounds).where(eq(xitiqueRounds.id, roundId)).for("update");
     if (!round) throw new DomainError("xitique_ronda", "Ronda não encontrada.");
     const actorMember = await requireMember(tx, round.groupId, actor.id);
-    if (round.recipientMemberId !== actorMember.id) throw new DomainError("xitique_acesso", "Só quem recebe pode confirmar o recebimento.");
+    const [recipient] = await tx.select().from(xitiqueMembers).where(eq(xitiqueMembers.id, round.recipientMemberId));
+    const recordedForOfflineMember = !recipient.userId && actorMember.role === "tesoureiro";
+    if (round.recipientMemberId !== actorMember.id && !recordedForOfflineMember) throw new DomainError("xitique_acesso", "Só quem recebe pode confirmar o recebimento.");
     if (round.status === "paga") return;
+    if (recordedForOfflineMember && (!input.receiptNote || input.receiptNote.trim().length < 10 || input.receiptNote.length > 4000)) throw new DomainError("xitique_recibo", "Regista como e a quem entregaste o valor.");
     const contributions = await tx.select().from(xitiqueContributions).where(eq(xitiqueContributions.roundId, roundId));
     const received = contributions.filter((row) => row.status === "confirmada").reduce((sum, row) => sum + row.amountCents, 0);
-    if (received === 0) throw new DomainError("xitique_estado", "Ainda não há contribuições confirmadas nesta ronda.");
-    await postEntry(tx, {
+    if (!contributions.length || contributions.some((contribution) => contribution.status !== "confirmada")) throw new DomainError("xitique_estado", "Faltam contribuições confirmadas nesta ronda.");
+    if (!recordedForOfflineMember) await postEntry(tx, {
       userId: actor.id,
       kind: "xitique_recebimento",
       occurredAt: new Date(),
@@ -228,7 +234,9 @@ export async function confirmPayout(db: Db, actor: Actor, roundId: string) {
       ],
     });
     await tx.update(xitiqueRounds).set({ status: "paga", paidOutAt: new Date(), paidOutConfirmedBy: actor.id }).where(eq(xitiqueRounds.id, roundId));
-    await logEvent(tx, round.groupId, "ronda_paga", actor.id, `${actor.displayName} confirmou que recebeu ${formatMT(received)} na ronda ${round.number}.`);
+    await logEvent(tx, round.groupId, "ronda_paga", actor.id, recordedForOfflineMember
+      ? `${actor.displayName} registou a entrega de ${formatMT(received)} a ${recipient.displayName} na ronda ${round.number}: ${input.receiptNote!.trim()}`
+      : `${actor.displayName} confirmou que recebeu ${formatMT(received)} na ronda ${round.number}.`);
     const [next] = await tx.select({ id: xitiqueRounds.id }).from(xitiqueRounds).where(and(eq(xitiqueRounds.groupId, round.groupId), eq(xitiqueRounds.status, "aberta"))).limit(1);
     if (!next) {
       await tx.update(xitiqueGroups).set({ status: "concluido" }).where(eq(xitiqueGroups.id, round.groupId));
@@ -296,7 +304,7 @@ export async function groupDetail(db: Executor, groupId: string, userId: string 
       contributions: contributions
         .map((row) => row.contribution)
         .filter((row) => row.roundId === round.id)
-        .map((row) => ({ ...row, memberName: byMember.get(row.memberId)?.displayName ?? "—" })),
+        .map((row) => ({ ...row, memberName: byMember.get(row.memberId)?.displayName ?? "—", canConfirm: Boolean(userId && row.status === "declarada" && mayConfirmContribution(members, userId, round.recipientMemberId, row.declaredBy)) })),
     })),
     currentRound,
     myMember,

@@ -1,23 +1,24 @@
 import "server-only";
 import { eq } from "drizzle-orm";
+import { DEFAULT_SUPPORT_WHATSAPP } from "@/lib/contact";
 import type { Executor } from "./db/client";
 import { settings } from "./db/schema";
 
 /*
  * Every number here is a working assumption, not an approved commercial term (KB §15.3, §44).
- * `isExample` drives the "Exemplo — por validar" label wherever these values appear.
+ * They are starting values that management changes in Definições; every change is audited.
  */
 export const defaults = {
   organisation: {
     name: "Ukuphila",
     tagline: "Crescer. Conectar. Prosperar.",
-    supportWhatsapp: "",
+    supportWhatsapp: DEFAULT_SUPPORT_WHATSAPP,
     supportPhone: "",
     supportEmail: "",
     legalEntity: "",
   },
   offlinePolicy: {
-    isExample: true,
+    isExample: false,
     maxOpCents: 2_500_000,
     maxPendingCents: 10_000_000,
     maxAgeDays: 14,
@@ -39,14 +40,14 @@ export const defaults = {
     ],
   },
   trustPolicy: {
-    version: "2026.11-exemplo",
-    isExample: true,
+    version: "2026.11",
+    isExample: false,
     ring2: { activeDays14: 5 },
     ring3: { activeDays30: 12, minKycLevel: 1 },
     ring4: { minMonths: 3, activeDays90: 45, minKycLevel: 2, minSavingsMonths: 2, minXitiquePunctuality: 0.85 },
   },
   agentRates: {
-    isExample: true,
+    isExample: false,
     onboardingCents: 15_000,
     kycCompleteCents: 10_000,
     activation30dCents: 20_000,

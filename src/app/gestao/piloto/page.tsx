@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { updateReadinessAction } from "@/actions/gestao";
 import { ActionForm, SubmitButton } from "@/components/forms";
-import { DataNote, ExampleTag, PageHead, SectionTitle, Stat } from "@/components/ui";
+import { DataNote, PageHead, SectionTitle, Stat } from "@/components/ui";
 import { formatPct, pct } from "@/lib/money";
 import { programmeKpis, repaymentStats } from "@/server/analytics/programme";
 import { can } from "@/server/auth/permissions";
@@ -33,7 +33,7 @@ export default async function PilotPage() {
   ];
   return (
     <>
-      <PageHead eyebrow="Governação" title="Piloto e prontidão" lead="O objectivo do piloto é aprender, não parecer grande. Um mercado, um número controlado de pessoas e critérios claros para continuar ou parar." actions={<ExampleTag>Valores do cenário sintético</ExampleTag>} />
+      <PageHead eyebrow="Governação" title="Piloto e prontidão" lead="O objectivo do piloto é aprender, não parecer grande. Um mercado, um número controlado de pessoas e critérios claros para continuar ou parar." />
       <div className="stat-grid">
         <Stat tone="night" icon="flag" label="Critérios validados" value={`${validated} de ${items.length}`} hint="Antes de qualquer operação real" />
         <Stat icon="users" label="Comerciantes" value={kpis.merchants} />

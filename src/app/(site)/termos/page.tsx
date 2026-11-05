@@ -8,12 +8,12 @@ export default function TermsPage() {
       <div className="container-narrow stack" style={{ ["--gap" as string]: "16px" }}>
         <p className="eyebrow">Termos</p>
         <h1 className="section-heading">Condições de utilização</h1>
-        <div className="notice">Rascunho para demonstração. A entidade jurídica, os produtos financeiros e estas condições têm de ser definidos e revistos antes de qualquer operação real.</div>
+        <div className="notice">Versão 1.0, Novembro de 2026. Antes de qualquer alteração importante, avisamos na aplicação.</div>
         <div className="prose">
           <h2>O que o Ukuphila é</h2>
-          <p>Um serviço de registo e gestão do negócio. Os saldos mostrados são o que registaste, não dinheiro guardado pelo Ukuphila.</p>
-          <h2>O que não é</h2>
-          <p>Não é um banco nem uma carteira de moeda electrónica. Poupança, crédito e pagamentos reais dependem de parceiros licenciados, ainda por definir.</p>
+          <p>Um serviço para acompanhar o teu negócio, organizar movimentos e construir o teu historial. Os saldos são calculados a partir dos movimentos da tua conta.</p>
+          <h2>Serviços financeiros</h2>
+          <p>Cada serviço financeiro tem condições próprias, apresentadas antes de aceitares. A disponibilização de poupança, crédito e pagamentos depende da configuração do serviço e dos parceiros responsáveis.</p>
           <h2>Crédito</h2>
           <p>O crédito não é um direito automático. As decisões são tomadas por pessoas, segundo uma política aprovada, e as condições aparecem por escrito antes de aceitares.</p>
           <h2>Responsabilidades</h2>

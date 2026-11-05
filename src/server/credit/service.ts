@@ -1,5 +1,7 @@
 import "server-only";
 import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
+import { z } from "zod";
+import { agentProfile, assertAssigned } from "../agent/service";
 import { addDays, daysBetween, maputoDay } from "@/lib/dates";
 import { formatMT } from "@/lib/money";
 import { recordAudit } from "../audit";
@@ -201,7 +203,7 @@ export async function acceptOffer(db: Db, user: SessionUser, applicationId: stri
         principalCents,
         feeCents,
         termDays,
-        termsSnapshot: { policyVersion: policy.version, isExample: policy.params.isExample, graceDays: policy.params.graceDays, items: application.items, schedulePreview: preview },
+        termsSnapshot: { policyVersion: policy.version, isExample: policy.params.isExample, graceDays: policy.params.graceDays, defaultAfterDays: policy.params.defaultAfterDays, items: application.items, schedulePreview: preview },
         acceptedAt: new Date(),
         acceptedChannel: "app",
         deliveryCode: randomDigits(6),
@@ -284,9 +286,14 @@ export async function recordRepayment(db: Db, actor: SessionUser, contractId: st
     const tx = rawTx as Tx;
     const [contract] = await tx.select().from(creditContracts).where(eq(creditContracts.id, contractId)).for("update");
     if (!contract) throw new DomainError("contrato", "Contrato não encontrado.");
+    if (actor.role === "agent") await assertAssigned(tx, (await agentProfile(tx, actor.id)).id, contract.userId);
+    // A receipt already recorded is a no-op, even after the contract settled: retries must be harmless.
+    const [duplicate] = await tx.select({ contractId: creditRepayments.contractId, amountCents: creditRepayments.amountCents }).from(creditRepayments).where(eq(creditRepayments.reference, input.reference)).limit(1);
+    if (duplicate) {
+      if (duplicate.contractId !== contractId || duplicate.amountCents !== input.amountCents) throw new DomainError("referencia_em_uso", "Esta referência já pertence a outro pagamento.");
+      return;
+    }
     if (!["activo", "em_atraso", "incumprimento"].includes(contract.status)) throw new DomainError("contrato_estado", "Este contrato não aceita pagamentos.");
-    const [duplicate] = await tx.select({ id: creditRepayments.id }).from(creditRepayments).where(eq(creditRepayments.reference, input.reference)).limit(1);
-    if (duplicate) return;
     const instalments = await tx.select().from(creditInstalments).where(eq(creditInstalments.contractId, contractId)).orderBy(asc(creditInstalments.number));
     const outstanding = instalments.reduce((sum, row) => sum + row.amountCents - row.paidCents, 0);
     if (input.amountCents > outstanding) throw new DomainError("contrato_valor", `O valor em falta é ${formatMT(outstanding)}.`);
@@ -341,20 +348,25 @@ export async function markOverdue(db: Db, today = maputoDay()) {
   const grace = policy?.params.graceDays ?? 0;
   const defaultAfter = policy?.params.defaultAfterDays ?? 90;
   const rows = await db
-    .select({ instalment: creditInstalments, contract: creditContracts })
+    .select({ instalment: creditInstalments, contract: creditContracts, acceptedPolicy: creditPolicies.params })
     .from(creditInstalments)
     .innerJoin(creditContracts, eq(creditContracts.id, creditInstalments.contractId))
+    .innerJoin(creditApplications, eq(creditApplications.id, creditContracts.applicationId))
+    .innerJoin(creditPolicies, eq(creditPolicies.id, creditApplications.policyId))
     .where(and(inArray(creditInstalments.status, ["por_pagar", "parcial", "em_atraso"]), inArray(creditContracts.status, ["activo", "em_atraso", "incumprimento"])));
   let changed = 0;
-  for (const { instalment, contract } of rows) {
+  for (const { instalment, contract, acceptedPolicy } of rows) {
+    const terms = contract.termsSnapshot as { graceDays?: number; defaultAfterDays?: number };
+    const contractGrace = terms.graceDays ?? acceptedPolicy.graceDays ?? grace;
+    const contractDefaultAfter = terms.defaultAfterDays ?? acceptedPolicy.defaultAfterDays ?? defaultAfter;
     const late = daysBetween(instalment.dueDate, today);
-    if (late <= grace) continue;
+    if (late <= contractGrace) continue;
     if (instalment.status !== "em_atraso") {
       await db.update(creditInstalments).set({ status: "em_atraso" }).where(eq(creditInstalments.id, instalment.id));
       await notify(db, contract.userId, { title: "Prestação em atraso", body: `Falta pagar ${formatMT(instalment.amountCents - instalment.paidCents)}. Fala com o teu agente se precisares de ajuda.`, link: "/app/credito" });
       changed += 1;
     }
-    const status = late >= defaultAfter ? "incumprimento" : "em_atraso";
+    const status = late >= contractDefaultAfter ? "incumprimento" : "em_atraso";
     if (contract.status !== status && contract.status !== "incumprimento") {
       await db.update(creditContracts).set({ status }).where(eq(creditContracts.id, contract.id));
     }
@@ -371,8 +383,25 @@ export async function markOverdue(db: Db, today = maputoDay()) {
   return changed;
 }
 
-export async function proposePolicy(db: Db, actor: SessionUser, input: { version: string; params: CreditPolicyParams; note?: string | null }) {
+const policyInput = z.object({
+  version: z.string().trim().min(1).max(60),
+  note: z.string().trim().max(4000).nullish(),
+  params: z.object({
+    isExample: z.boolean(),
+    maxAmountByRing: z.object({ base: z.number().int().positive().max(Number.MAX_SAFE_INTEGER), second: z.number().int().positive().max(Number.MAX_SAFE_INTEGER), third: z.number().int().positive().max(Number.MAX_SAFE_INTEGER) }),
+    termOptionsDays: z.array(z.number().int().positive().max(3650)).min(1).max(24),
+    feePercentBasisPoints: z.number().int().min(0).max(10000),
+    graceDays: z.number().int().min(0).max(365),
+    defaultAfterDays: z.number().int().positive().max(3650),
+    concentrationLimitPct: z.number().positive().max(100),
+  }).refine((value) => value.defaultAfterDays > value.graceDays && value.maxAmountByRing.base <= value.maxAmountByRing.second && value.maxAmountByRing.second <= value.maxAmountByRing.third),
+});
+
+export async function proposePolicy(db: Db, actor: SessionUser, rawInput: { version: string; params: CreditPolicyParams; note?: string | null }) {
   if (!can(actor.role, "credit.policy.propose")) throw new DomainError("sem_permissao", "Não tens permissão para propor políticas.");
+  const parsed = policyInput.safeParse(rawInput);
+  if (!parsed.success) throw new DomainError("politica", "Revê a versão, os limites, os prazos e os custos da política.");
+  const input = parsed.data;
   await db.transaction(async (rawTx) => {
     const tx = rawTx as Tx;
     const [policy] = await tx.insert(creditPolicies).values({ version: input.version, params: input.params, note: input.note ?? null, createdBy: actor.id }).returning();

@@ -1,0 +1,7 @@
+CX3 concluída. Relatório em [docs/codex/CX3.md](<C:/Users/Dell's/ukuphila/docs/codex/CX3.md>).
+
+- Vitest CX3: **84 aprovados, 5 falhas esperadas, 1 pendente**.
+- Suite geral: **136 aprovados, 5 falhas esperadas, 1 pendente**.
+- TypeScript: **sem erros**.
+
+Documentei dois defeitos reproduzidos: SQL de bloqueio do Xitique e repetição do pagamento final de crédito. Criei apenas os ficheiros autorizados; sem alterações em `src/`, servidores ou commits.

@@ -47,6 +47,14 @@ export async function assertAssigned(db: Executor, agentId: string, merchantId: 
   if (!business || business.agentId !== agentId) throw new DomainError("sem_permissao", "Este comerciante não está na tua carteira.");
 }
 
+/** For actions open to agents and staff: an agent only ever touches merchants in their own portfolio. */
+export async function assertAgentScope(db: Executor, actor: { id: string; role: string }, merchantId: string | null) {
+  if (actor.role !== "agent") return;
+  if (!merchantId) throw new DomainError("sem_permissao", "Este registo não pertence à tua carteira.");
+  const agent = await agentProfile(db, actor.id);
+  await assertAssigned(db, agent.id, merchantId);
+}
+
 export async function logAgentView(db: Executor, agentUser: SessionUser, merchantId: string, resource: string) {
   await db.insert(accessLog).values({ subjectId: merchantId, actorId: agentUser.id, actorRole: agentUser.role, purpose: "Apoio do agente", resource });
 }
@@ -147,7 +155,8 @@ export async function onboardMerchant(
     await tx.insert(consents).values(
       [...required, ...input.consentOptional].map((purpose) => ({ userId: created.id, purpose, policyVersion: "2026.11", channel: "agente", capturedBy: agentUser.id })),
     );
-    await tx.update(businesses).set({ onboardingStep: 5 }).where(eq(businesses.ownerId, created.id));
+    // Presenting, consent and the profile are done at this point; verification and the rest follow on the checklist.
+    await tx.update(businesses).set({ onboardingStep: 3 }).where(eq(businesses.ownerId, created.id));
     await tx.insert(agentEarnings).values({ agentId: agent.id, kind: "registo", amountCents: rates.onboardingCents, subjectUserId: created.id });
     return created;
   });
@@ -197,6 +206,9 @@ export async function openIncident(db: Db, actor: { id: string; role: string }, 
 
 export async function resolveIncident(db: Db, actor: { id: string; role: string }, incidentId: string, resolution: string) {
   if (resolution.trim().length < 5) throw new DomainError("incidente", "Escreve como ficou resolvido.");
+  const [incident] = await db.select({ subject: incidents.subjectUserId }).from(incidents).where(eq(incidents.id, incidentId)).limit(1);
+  if (!incident) throw new DomainError("incidente", "Incidente não encontrado.");
+  await assertAgentScope(db, actor, incident.subject);
   await db.transaction(async (rawTx) => {
     const tx = rawTx as Tx;
     const rows = await tx.update(incidents).set({ status: "resolvido", resolution, resolvedAt: new Date(), assignedTo: actor.id }).where(eq(incidents.id, incidentId)).returning({ code: incidents.code, subject: incidents.subjectUserId });
@@ -207,6 +219,9 @@ export async function resolveIncident(db: Db, actor: { id: string; role: string 
 
 /** Lost phone: sessions end now, the device is blocked, and the local copy is wiped the next time it reaches the network. */
 export async function reportDeviceLost(db: Db, actor: { id: string; role: string }, deviceId: string) {
+  const [owner] = await db.select({ userId: devices.userId }).from(devices).where(eq(devices.id, deviceId)).limit(1);
+  if (!owner) throw new DomainError("dispositivo", "Dispositivo não encontrado.");
+  await assertAgentScope(db, actor, owner.userId);
   await db.transaction(async (rawTx) => {
     const tx = rawTx as Tx;
     const [device] = await tx.update(devices).set({ status: "perdido", wipeRequestedAt: new Date() }).where(eq(devices.id, deviceId)).returning();
@@ -217,12 +232,14 @@ export async function reportDeviceLost(db: Db, actor: { id: string; role: string
 }
 
 export async function createLease(db: Db, agentUser: SessionUser, input: { merchantId: string; modelId: string; instalmentCents: number; instalments: number; serial?: string | null }) {
+  if (!Number.isInteger(input.instalments) || input.instalments < 1 || input.instalments > 104) throw new DomainError("leasing", "O número de prestações tem de estar entre 1 e 104.");
+  if (!Number.isSafeInteger(input.instalmentCents) || input.instalmentCents <= 0 || input.instalmentCents > 5_000_000) throw new DomainError("leasing", "Valor de prestação inválido.");
   const agent = await agentProfile(db, agentUser.id);
   await assertAssigned(db, agent.id, input.merchantId);
   return db.transaction(async (rawTx) => {
     const tx = rawTx as Tx;
     const [device] = await tx.insert(devices).values({ userId: input.merchantId, modelId: input.modelId, label: "Telefone Ukuphila", serial: input.serial ?? null, status: "activo" }).returning();
-    const [lease] = await tx.insert(deviceLeases).values({ code: `LS-${randomCode(6)}`, deviceId: device.id, userId: input.merchantId, agentId: agent.id, instalmentCents: input.instalmentCents, instalments: input.instalments }).returning();
+    const [lease] = await tx.insert(deviceLeases).values({ code: `LS-${randomCode(6)}`, deviceId: device.id, userId: input.merchantId, agentId: agent.id, instalmentCents: input.instalmentCents, instalments: input.instalments, isExampleTerms: false }).returning();
     const today = maputoDay();
     await tx.insert(leasePayments).values(Array.from({ length: input.instalments }, (_, index) => ({ leaseId: lease.id, number: index + 1, dueDate: addDays(today, (index + 1) * 7), amountCents: input.instalmentCents })));
     await recordAudit(tx, { actorId: agentUser.id, actorRole: agentUser.role, action: "leasing.criado", subjectType: "lease", subjectId: lease.id, targetUserId: input.merchantId });

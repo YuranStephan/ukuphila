@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Badge, ExampleTag, PageHead } from "@/components/ui";
+import { Badge, PageHead } from "@/components/ui";
 import { formatMT } from "@/lib/money";
 import { agentPerformance } from "@/server/analytics/programme";
 import { requirePage } from "@/server/auth/session";
@@ -12,7 +12,7 @@ export default async function AgentsPage() {
   const rows = await agentPerformance(await getDb());
   return (
     <>
-      <PageHead eyebrow="Pessoas" title="Agentes" lead="Quem está no terreno, a carteira de cada um e como está a correr." actions={<ExampleTag>Comissões de exemplo</ExampleTag>} />
+      <PageHead eyebrow="Pessoas" title="Agentes" lead="Quem está no terreno, a carteira de cada um e como está a correr." />
       <section className="card card-flush">
         <div className="table-wrap">
           <table className="table">

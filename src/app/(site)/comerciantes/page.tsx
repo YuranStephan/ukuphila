@@ -32,9 +32,6 @@ export default function MerchantsPage() {
               </article>
             ))}
           </div>
-          <div className="notice">
-            <strong>Importante:</strong> o Ukuphila regista o teu negócio, não guarda o teu dinheiro. Os valores nos bolsos são o que tu registaste. O dinheiro continua contigo, na tua carteira móvel ou no banco.
-          </div>
           <div>
             <Link className="btn btn-primary" href="/registar">
               Criar conta <Icon name="arrowRight" size={18} />

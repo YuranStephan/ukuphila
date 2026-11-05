@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Badge, ExampleTag, PageHead, Stat } from "@/components/ui";
+import { Badge, PageHead, Stat } from "@/components/ui";
 import { relativeTime } from "@/lib/dates";
 import { formatMT } from "@/lib/money";
 import { listDevices } from "@/server/admin/queries";
@@ -14,7 +14,7 @@ export default async function DevicesPage() {
   const leased = rows.filter((row) => row.lease);
   return (
     <>
-      <PageHead eyebrow="Operação" title="Telefones e leasing" lead="Cada telefone tem chave própria. Um telefone perdido é bloqueado e a cópia local é apagada quando voltar à rede." actions={<ExampleTag>Condições de leasing por definir</ExampleTag>} />
+      <PageHead eyebrow="Operação" title="Telefones e leasing" lead="Cada telefone tem chave própria. Um telefone perdido é bloqueado e a cópia local é apagada quando voltar à rede." />
       <div className="stat-grid">
         <Stat icon="phone" label="Telefones activos" value={rows.filter((row) => row.device.status === "activo").length} />
         <Stat icon="coins" label="Em leasing" value={leased.length} />

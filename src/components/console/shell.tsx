@@ -15,15 +15,10 @@ function isCurrent(pathname: string, item: NavItem) {
   return item.exact ? pathname === item.href : pathname === item.href || pathname.startsWith(`${item.href}/`);
 }
 
-export function ConsoleShell({ kicker, groups, user, night, demo, children }: { kicker: string; groups: NavGroup[]; user: { name: string; role: string }; night?: boolean; demo?: boolean; children: ReactNode }) {
+export function ConsoleShell({ kicker, groups, user, night, children }: { kicker: string; groups: NavGroup[]; user: { name: string; role: string }; night?: boolean; demo?: boolean; children: ReactNode }) {
   const pathname = usePathname();
   return (
     <>
-      {demo ? (
-        <p className="demo-bar no-print">
-          Dados sintéticos de demonstração. <Link href="/demo">Trocar de pessoa</Link>
-        </p>
-      ) : null}
       <div className="console">
         <aside className="rail no-print">
           <div className="rail-brand">
@@ -67,20 +62,15 @@ export function ConsoleShell({ kicker, groups, user, night, demo, children }: { 
   );
 }
 
-export function FieldShell({ items, title, demo, children }: { items: NavItem[]; title: string; demo?: boolean; children: ReactNode }) {
+export function FieldShell({ items, title, children }: { items: NavItem[]; title: string; demo?: boolean; children: ReactNode }) {
   const pathname = usePathname();
   return (
     <div className="field-app">
-      {demo ? (
-        <p className="demo-bar no-print">
-          Dados sintéticos. <Link href="/demo">Trocar de pessoa</Link>
-        </p>
-      ) : null}
       <header className="field-top">
         <Logo tone="light" size={24} />
         <span className="tiny">{title}</span>
         <form action={signOutAction}>
-          <button type="submit" aria-label="Terminar sessão" style={{ color: "inherit", display: "grid", placeItems: "center", width: 36, height: 36 }}>
+          <button type="submit" aria-label="Terminar sessão" style={{ color: "inherit", display: "grid", placeItems: "center", width: 44, height: 44 }}>
             <Icon name="logout" size={18} />
           </button>
         </form>

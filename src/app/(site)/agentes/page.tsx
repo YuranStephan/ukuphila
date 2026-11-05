@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { LeadForm } from "@/components/site/lead-form";
-import { PageHero } from "@/components/site/page-hero";
+import { AgentMarketPhoto } from "@/components/site/agent-market-photo";
 
 export const metadata: Metadata = { title: "Agentes e quiosques" };
 
@@ -16,7 +16,16 @@ const CONTROLS = ["Identidade própria para cada agente.", "Só vê a sua cartei
 export default function AgentsPage() {
   return (
     <>
-      <PageHero eyebrow="Agentes e quiosques" title="A tecnologia não entra sozinha no mercado." lead="O agente é uma escolha deliberada: uma pessoa de confiança, no quiosque, que faz a ponte entre o Ukuphila e a vida real do mercado." />
+      <section className="agent-page-hero" data-surface="noite">
+        <div className="container agent-page-hero-grid">
+          <div className="agent-page-hero-copy">
+            <p className="eyebrow">Agentes e quiosques</p>
+            <h1>A tecnologia não entra sozinha no mercado.</h1>
+            <p className="section-lead">Uma pessoa de confiança, perto de ti. O agente faz a ponte entre o Ukuphila e a vida do mercado: ensina, acompanha e ajuda a dar o próximo passo.</p>
+          </div>
+          <AgentMarketPhoto preload />
+        </div>
+      </section>
       <section className="section">
         <div className="container stack" style={{ ["--gap" as string]: "30px" }}>
           <div className="content-grid two">

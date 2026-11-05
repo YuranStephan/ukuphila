@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { analyseAction, decideAction } from "@/actions/credit";
 import { TrustPanel } from "@/components/console/merchant-dossier";
 import { ActionForm } from "@/components/forms";
-import { Badge, ExampleTag, PageHead, SectionTitle } from "@/components/ui";
+import { Badge, PageHead, SectionTitle } from "@/components/ui";
 import { formatDateTime } from "@/lib/dates";
 import { APPLICATION_LABELS, CREDIT_REASON_CODES } from "@/lib/labels";
 import { formatMT } from "@/lib/money";
@@ -51,7 +51,7 @@ export default async function ApplicationPage({ params }: { params: Promise<{ id
         <TrustPanel trust={trust} />
         <div className="stack">
           <section className="card">
-            <SectionTitle title="O pedido" action={policy?.params.isExample ? <ExampleTag>Política de exemplo</ExampleTag> : null} />
+            <SectionTitle title="O pedido" action={policy ? <span className="tiny muted">Política {policy.version}</span> : null} />
             <dl className="kv">
               {application.items.map((item) => (
                 <div key={item.name}>

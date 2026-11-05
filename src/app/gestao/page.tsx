@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BarList, ColumnChart, Funnel, StackedLine, TableView } from "@/components/charts";
-import { Badge, DataNote, ExampleTag, PageHead, SectionTitle, Stat } from "@/components/ui";
+import { Badge, DataNote, PageHead, SectionTitle, Stat } from "@/components/ui";
 import { formatShortDay } from "@/lib/dates";
 import { formatCompact, formatMT, formatPct, pct } from "@/lib/money";
 import { activitySeries, creditPipeline, creditPortfolio, marketBreakdown, programmeKpis, ringFunnel, riskOverview } from "@/server/analytics/programme";
@@ -20,7 +20,7 @@ export default async function GestaoHome() {
   const open = pipeline.filter((row) => ["submetido", "em_analise", "recomendado"].includes(row.status)).reduce((sum, row) => sum + row.total, 0);
   return (
     <>
-      <PageHead eyebrow="Gestão" title="Visão geral" lead="Tudo aqui vem das tabelas operacionais, sem números escritos à mão. A pergunta do piloto é uma só: as pessoas usam isto todos os dias?" actions={<ExampleTag>Dados sintéticos · cenário de demonstração</ExampleTag>} />
+      <PageHead eyebrow="Gestão" title="Visão geral" lead="Tudo aqui vem das tabelas operacionais, sem números escritos à mão. A pergunta do piloto é uma só: as pessoas usam isto todos os dias?" />
       <div className="stat-grid">
         <Stat tone="night" icon="users" label="Comerciantes" value={kpis.merchants} hint={`${kpis.newMerchants30} novos em 30 dias`} href="/gestao/comerciantes" />
         <Stat icon="activity" label="Activos na semana" value={kpis.wau} hint={`${formatPct(pct(kpis.wau, kpis.mau))} dos activos no mês`} />
@@ -121,7 +121,7 @@ export default async function GestaoHome() {
           </p>
         </section>
       </div>
-      <DataNote>Vendas registadas somam {formatCompact(kpis.salesRecorded30)} MT em 30 dias. São valores declarados pelos comerciantes, não dinheiro guardado pelo Ukuphila.</DataNote>
+      <DataNote>Vendas registadas somam {formatCompact(kpis.salesRecorded30)} MT em 30 dias, a partir dos movimentos declarados pelos comerciantes.</DataNote>
     </>
   );
 }

@@ -17,7 +17,8 @@ async function open(): Promise<{ db: Db; close: () => Promise<void> }> {
 async function main() {
   switch (command) {
     case "migrate": {
-      if (url) await migratePostgres(url);
+      // DDL goes through the session pooler (5432); the transaction pooler (6543) is for the running app.
+      if (url) await migratePostgres(process.env.DATABASE_MIGRATION_URL ?? url.replace(".pooler.supabase.com:6543/", ".pooler.supabase.com:5432/"));
       else await (await openPglite(localDataDir())).close();
       console.log("Migrações aplicadas.");
       return;
@@ -44,7 +45,8 @@ async function main() {
       const normalized = email.trim().toLowerCase();
       const [existing] = await db.select({ id: users.id }).from(users).where(eq(users.email, normalized)).limit(1);
       if (existing) {
-        await db.update(users).set({ role: "admin", kind: "staff", status: "activo", passwordHash: await hashSecret(password) }).where(eq(users.id, existing.id));
+        await close();
+        throw new Error("Já existe uma conta com este identificador. Nenhuma credencial foi alterada.");
       } else {
         await db.insert(users).values({ kind: "staff", role: "admin", email: normalized, displayName: name, status: "activo", passwordHash: await hashSecret(password) });
       }

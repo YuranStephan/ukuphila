@@ -259,7 +259,8 @@ export async function seedIfEmpty(db: Db) {
   await db.transaction(async (rawTx) => {
     const tx = rawTx as Tx;
     await seedCore(tx);
-    if (isDemo() || !process.env.DATABASE_URL) await seedDemo(tx);
+    // Synthetic people only exist when explicitly asked for (local testing). A real database starts empty.
+    if (isDemo()) await seedDemo(tx);
   });
 }
 

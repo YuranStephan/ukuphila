@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { saveAgentRatesAction, saveOfflinePolicyAction, saveOrganisationAction, saveTrustPolicyAction } from "@/actions/gestao";
 import { ActionForm, SubmitButton } from "@/components/forms";
-import { ExampleTag, PageHead, SectionTitle } from "@/components/ui";
+import { PageHead, SectionTitle } from "@/components/ui";
 import { can } from "@/server/auth/permissions";
 import { requirePage } from "@/server/auth/session";
 import { getDb } from "@/server/db/client";
@@ -28,7 +28,7 @@ export default async function SettingsPage() {
   const editable = can(user.role, "settings.manage");
   return (
     <>
-      <PageHead eyebrow="Governação" title="Definições" lead="Regras de trabalho do programa. Cada alteração fica na auditoria. Valores de exemplo até haver decisão formal." actions={<ExampleTag>Valores por validar</ExampleTag>} />
+      <PageHead eyebrow="Governação" title="Definições" lead="Regras de trabalho do programa. Cada alteração fica na auditoria." />
       <fieldset disabled={!editable} style={{ border: 0, padding: 0, margin: 0 }}>
         <div className="grid-even">
           <section className="card">

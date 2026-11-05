@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Badge, EmptyState, ExampleTag, PageHead, Stat } from "@/components/ui";
+import { Badge, EmptyState, PageHead, Stat } from "@/components/ui";
 import { formatDateTime, relativeTime } from "@/lib/dates";
 import { DOCUMENT_STATUS_LABELS, DOCUMENT_TYPES, REJECTION_REASONS } from "@/lib/labels";
 import { listDocuments } from "@/server/admin/queries";
@@ -16,7 +16,7 @@ export default async function KycPage() {
   const [queue, decided, kpis] = await Promise.all([listDocuments(db, "fila"), listDocuments(db, "decididos"), programmeKpis(db)]);
   return (
     <>
-      <PageHead eyebrow="Decisões" title="KYC e documentos" lead="Quem submete um documento nunca o pode aprovar. Cada decisão fica com responsável, hora e motivo." actions={<ExampleTag>Tipos de documento por validar</ExampleTag>} />
+      <PageHead eyebrow="Decisões" title="KYC e documentos" lead="Quem submete um documento nunca o pode aprovar. Cada decisão fica com responsável, hora e motivo." />
       <div className="stat-grid">
         <Stat tone="sun" icon="document" label="Na fila" value={queue.length} />
         <Stat icon="sync" label="Tempo médio de revisão" value={`${kpis.kycHours} h`} />

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Badge, ExampleTag, PageHead, Stat, type Tone } from "@/components/ui";
+import { Badge, PageHead, Stat, type Tone } from "@/components/ui";
 import { relativeTime } from "@/lib/dates";
 import { APPLICATION_LABELS } from "@/lib/labels";
 import { formatMT } from "@/lib/money";
@@ -11,7 +11,7 @@ import { getDb } from "@/server/db/client";
 
 export const metadata: Metadata = { title: "Crédito" };
 
-export const APP_TONE: Record<string, Tone> = { submetido: "warn", em_analise: "warn", recomendado: "info", aprovado: "good", aceite: "good", recusado: "bad", desistido: "neutral", expirado: "neutral" };
+const APP_TONE: Record<string, Tone> = { submetido: "warn", em_analise: "warn", recomendado: "info", aprovado: "good", aceite: "good", recusado: "bad", desistido: "neutral", expirado: "neutral" };
 
 export default async function CreditPage() {
   await requirePage("credit.read");
@@ -20,7 +20,7 @@ export default async function CreditPage() {
   const count = (...statuses: string[]) => pipeline.filter((row) => statuses.includes(row.status)).reduce((sum, row) => sum + row.total, 0);
   return (
     <>
-      <PageHead eyebrow="Decisões" title="Crédito fornecedor" lead="O crédito nunca é automático: a análise recomenda, outra pessoa aprova e o comerciante aceita com o seu PIN." actions={<ExampleTag>Política de exemplo</ExampleTag>} />
+      <PageHead eyebrow="Decisões" title="Crédito fornecedor" lead="O crédito nunca é automático: a análise recomenda, outra pessoa aprova e o comerciante aceita com o seu PIN." />
       <div className="stat-grid">
         <Stat tone="sun" icon="document" label="Por analisar" value={count("submetido", "em_analise")} />
         <Stat icon="users" label="Por aprovar" value={count("recomendado")} hint="Precisa de outra pessoa" />

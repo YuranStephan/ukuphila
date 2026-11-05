@@ -113,7 +113,7 @@ export const otpChallenges = ukuphila.table(
   {
     id: id(),
     phone: text("phone").notNull(),
-    purpose: text("purpose").$type<"entrar" | "registo" | "pin">().notNull(),
+    purpose: text("purpose").$type<"entrar" | "registo" | "pin" | "activacao">().notNull(),
     codeHash: text("code_hash").notNull(),
     attempts: integer("attempts").notNull().default(0),
     expiresAt: ts("expires_at").notNull(),

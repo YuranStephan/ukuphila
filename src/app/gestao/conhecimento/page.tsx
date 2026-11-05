@@ -86,7 +86,7 @@ export default async function KnowledgePage({ searchParams }: { searchParams: Pr
           </table>
         </div>
       </section>
-      <DataNote>O documento mestre é uma base de trabalho. “Aprovado” aqui quer dizer disponível para a IA nesta demonstração, não validado juridicamente.</DataNote>
+      <DataNote>“Aprovado” quer dizer disponível para a IA. Cada documento deve ser revisto por quem tem autoridade sobre o seu domínio.</DataNote>
     </>
   );
 }

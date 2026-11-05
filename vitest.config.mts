@@ -6,6 +6,8 @@ export default defineConfig({
   test: {
     include: ["tests/**/*.test.ts"],
     pool: "forks",
+    // Each database suite starts PostgreSQL/WASM; bound memory use on developer machines.
+    maxWorkers: 2,
     testTimeout: 60_000,
     hookTimeout: 60_000,
     env: { AUTH_SECRET: "test-secret-test-secret-test-secret", DOCUMENT_KEY: "dGVzdC1kb2N1bWVudC1rZXktMzItYnl0ZXMtbG9uZyEh" },

@@ -4,11 +4,13 @@ import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { homeFor } from "@/server/auth/permissions";
-import { checkTotp, createMerchant, mustEnrolTotp, needsTotp, requestOtp, verifyOtp, verifyStaffPassword } from "@/server/auth/service";
+import { completeMfa, prepareMfa, type MfaChallenge } from "@/server/auth/mfa";
+import { checkTotp, createMerchant, hitLimit, mustEnrolTotp, needsTotp, requestOtp, verifyOtp, verifyStaffPassword } from "@/server/auth/service";
+import { normalizePhone } from "@/lib/phone";
 import { createSession, endSession } from "@/server/auth/session";
 import { openText } from "@/server/crypto";
 import { getDb, type Tx } from "@/server/db/client";
-import { markets, users } from "@/server/db/schema";
+import { consents, markets, users } from "@/server/db/schema";
 import { DomainError, publicMessage } from "@/server/errors";
 import { isDemo } from "@/server/env";
 import { STAFF } from "@/server/seed/catalog";
@@ -51,21 +53,27 @@ export async function verifyCodeAction(_: OtpState, form: FormData): Promise<Otp
   redirect(destination);
 }
 
-export async function staffLoginAction(_: ActionState & { needsTotp?: boolean }, form: FormData): Promise<ActionState & { needsTotp?: boolean }> {
+export type StaffLoginState = ActionState & { needsTotp?: boolean; enrolment?: MfaChallenge };
+
+export async function staffLoginAction(previous: StaffLoginState, form: FormData): Promise<StaffLoginState> {
   let destination = "/gestao";
   try {
     const db = await getDb();
-    const user = await verifyStaffPassword(db, String(form.get("email") ?? ""), String(form.get("password") ?? ""));
+    let user = await verifyStaffPassword(db, String(form.get("email") ?? ""), String(form.get("password") ?? ""));
     if (needsTotp(user)) {
       const code = String(form.get("totp") ?? "").trim();
       if (!code) return { needsTotp: true };
       if (!checkTotp(user, code)) return { needsTotp: true, error: "Código errado." };
     }
-    if (mustEnrolTotp(user)) throw new DomainError("mfa", "Esta função exige autenticação forte. Pede a configuração à equipa de gestão.");
+    if (mustEnrolTotp(user)) {
+      const code = String(form.get("totp") ?? "").trim();
+      if (!previous.enrolment?.token || !code) return { needsTotp: true, enrolment: prepareMfa(user) };
+      user = await completeMfa(db, user, previous.enrolment.token, code);
+    }
     await createSession(db, user.id, user.role, { mfa: needsTotp(user) });
     destination = safeNext(form.get("next")) ?? homeFor(user.role);
   } catch (error) {
-    return { error: publicMessage(error) };
+    return { ...previous, error: publicMessage(error) };
   }
   redirect(destination);
 }
@@ -84,14 +92,18 @@ export async function signupAction(_: OtpState, form: FormData): Promise<OtpStat
   if (!parsed.success) return { error: "Preenche os campos e aceita as condições para continuar." };
   try {
     const db = await getDb();
-    const { phone, code, reveal } = await requestOtp(db, parsed.data.phone, "registo");
-    const [market] = await db.select({ id: markets.id }).from(markets).where(eq(markets.id, parsed.data.marketId)).limit(1);
+    const phone = normalizePhone(parsed.data.phone);
+    if (!phone) throw new DomainError("telefone", "Esse número não parece um telemóvel de Moçambique.");
+    await hitLimit(db, `signup:${phone}`, 3, 3600);
+    const [market] = await db.select({ id: markets.id, name: markets.name }).from(markets).where(eq(markets.id, parsed.data.marketId)).limit(1);
     if (!market) throw new DomainError("mercado", "Escolhe o teu mercado.");
     await db.transaction(async (rawTx) => {
       const tx = rawTx as Tx;
-      await createMerchant(tx, { phone, displayName: parsed.data.displayName, businessName: parsed.data.businessName, marketId: market.id, activity: parsed.data.activity, category: parsed.data.activity }, { id: null, role: "merchant" });
+      const user = await createMerchant(tx, { phone, displayName: parsed.data.displayName, businessName: parsed.data.businessName, marketId: market.id, activity: parsed.data.activity, category: parsed.data.activity }, { id: null, role: "merchant" });
+      await tx.insert(consents).values({ userId: user.id, purpose: "servico_base", policyVersion: "2026.11", channel: "site", capturedBy: user.id });
     });
-    return { ok: true, phone, demoCode: reveal ? code : undefined };
+    // Identity is confirmed in person: the agent checks the face, finishes the details and hands over the entry code.
+    return { ok: true, phone, message: `Vai ao quiosque Ukuphila do mercado de ${market.name}. O agente confirma os teus dados e dá-te o código para entrares e criares o teu PIN.` };
   } catch (error) {
     return { error: publicMessage(error) };
   }

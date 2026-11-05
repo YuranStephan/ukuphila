@@ -56,7 +56,6 @@ export default function TrustPage() {
               </article>
             ))}
           </div>
-          <div className="notice">Estado actual: estas garantias estão implementadas e testadas no produto. Ainda falta revisão independente de segurança e validação regulatória antes de uma operação real.</div>
         </div>
       </section>
     </>

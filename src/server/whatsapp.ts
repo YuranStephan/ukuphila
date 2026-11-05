@@ -1,13 +1,13 @@
 import "server-only";
 import { createHmac } from "node:crypto";
-import { eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { normalizePhone } from "@/lib/phone";
 import { respond } from "./ai/conversation";
 import { safeEqual } from "./crypto";
-import type { Db } from "./db/client";
+import type { Db, Tx } from "./db/client";
 import { users, whatsappMessages } from "./db/schema";
 
-const GRAPH_VERSION = "v21.0";
+const GRAPH_VERSION = process.env.WHATSAPP_GRAPH_VERSION ?? "v21.0";
 
 export function verifyWebhookSignature(rawBody: string, header: string | null) {
   const secret = process.env.WHATSAPP_APP_SECRET;
@@ -32,19 +32,36 @@ async function deliver(phone: string, body: string) {
 
 const UNKNOWN_NUMBER = "Olá! Este número ainda não tem conta Ukuphila. Fala com um agente no teu mercado para começares.";
 
-/** Every inbound message, real or simulated, takes this path. A repeated provider id is ignored, so retries are harmless. */
+/** Persist the reply with the business operation before delivery. Provider retries reuse that reply and cannot repeat the operation. */
 export async function handleInbound(db: Db, input: { phone: string; body: string; providerId?: string | null; simulated?: boolean }) {
   const phone = normalizePhone(input.phone) ?? input.phone;
-  const [user] = await db.select({ id: users.id }).from(users).where(eq(users.phone, phone)).limit(1);
-  const inserted = await db
-    .insert(whatsappMessages)
-    .values({ direction: "entrada", phone, userId: user?.id ?? null, body: input.body.slice(0, 2000), providerId: input.providerId ?? null, simulated: input.simulated ?? false })
-    .onConflictDoNothing()
-    .returning({ id: whatsappMessages.id });
-  if (inserted.length === 0) return null;
-  const reply = user ? await respond(db, { userId: user.id, channel: "whatsapp", text: input.body }) : null;
-  const text = reply?.text ?? UNKNOWN_NUMBER;
-  const delivery = input.simulated ? { status: "registada" as const } : await deliver(phone, text);
-  await db.insert(whatsappMessages).values({ direction: "saida", phone, userId: user?.id ?? null, body: text, status: delivery.status, simulated: input.simulated ?? false });
-  return { text, intent: reply?.intent ?? "SEM_CONTA", engine: reply?.engine ?? "regras", guardrails: reply?.guardrails ?? [], sources: reply?.sources ?? [] };
+  const prepared = await db.transaction(async (rawTx) => {
+    const tx = rawTx as Tx;
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${`whatsapp:${phone}`}))`);
+    const [user] = await tx.select({ id: users.id }).from(users).where(and(eq(users.phone, phone), eq(users.role, "merchant"), eq(users.status, "activo"))).limit(1);
+    const replyId = input.providerId ? `reply:${input.providerId}` : null;
+    if (replyId) {
+      const [existing] = await tx.select().from(whatsappMessages).where(eq(whatsappMessages.providerId, replyId)).limit(1);
+      if (existing) return { outgoing: existing, reply: null, duplicate: true };
+    }
+    await tx.insert(whatsappMessages).values({ direction: "entrada", phone, userId: user?.id ?? null, body: input.body.slice(0, 2000), providerId: input.providerId ?? null, simulated: input.simulated ?? false }).onConflictDoNothing();
+    const reply = user ? await respond(tx as unknown as Db, { userId: user.id, channel: "whatsapp", text: input.body.slice(0, 2000) }) : null;
+    const [outgoing] = await tx.insert(whatsappMessages).values({ direction: "saida", phone, userId: user?.id ?? null, body: reply?.text ?? UNKNOWN_NUMBER, providerId: replyId, status: input.simulated ? "registada" : "pendente", simulated: input.simulated ?? false }).returning();
+    return { outgoing, reply, duplicate: false };
+  });
+
+  if (!input.simulated) {
+    const sent = await db.transaction(async (rawTx) => {
+      const tx = rawTx as Tx;
+      const [outgoing] = await tx.select().from(whatsappMessages).where(eq(whatsappMessages.id, prepared.outgoing.id)).for("update");
+      if (outgoing.status === "enviada") return true;
+      const delivery = await deliver(phone, outgoing.body).catch(() => ({ status: "falhou" as const }));
+      await tx.update(whatsappMessages).set({ status: delivery.status }).where(eq(whatsappMessages.id, outgoing.id));
+      return delivery.status === "enviada";
+    });
+    if (!sent) throw new Error("Não foi possível entregar a resposta no WhatsApp.");
+  }
+  if (prepared.duplicate) return null;
+  const reply = prepared.reply;
+  return { text: prepared.outgoing.body, intent: reply?.intent ?? "SEM_CONTA", engine: reply?.engine ?? "regras", guardrails: reply?.guardrails ?? [], sources: reply?.sources ?? [] };
 }

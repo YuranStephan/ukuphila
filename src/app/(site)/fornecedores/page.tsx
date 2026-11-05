@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { ExampleTag } from "@/components/ui";
 import { LeadForm } from "@/components/site/lead-form";
 import { PageHero } from "@/components/site/page-hero";
 
@@ -30,9 +29,6 @@ export default function SuppliersPage() {
                 </li>
               ))}
             </ol>
-            <div>
-              <ExampleTag>Condições comerciais por definir com cada parceiro</ExampleTag>
-            </div>
           </div>
           <div className="card">
             <h3 className="card-title">Quero conversar</h3>

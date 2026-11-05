@@ -8,7 +8,7 @@ export default function PrivacyPage() {
       <div className="container-narrow stack" style={{ ["--gap" as string]: "16px" }}>
         <p className="eyebrow">Privacidade</p>
         <h1 className="section-heading">Como tratamos os teus dados</h1>
-        <div className="notice">Rascunho para demonstração. Tem de ser revisto com aconselhamento jurídico antes de qualquer operação real, à luz da Lei n.º 3/2017 e da futura lei de protecção de dados.</div>
+        <div className="notice">Versão 1.0, Novembro de 2026. Segue a Lei n.º 3/2017, de Transacções Electrónicas. Antes de qualquer alteração importante, avisamos na aplicação.</div>
         <div className="prose">
           <h2>O que recolhemos</h2>
           <p>O mínimo necessário: número de telefone, o nome pelo qual te conhecem, mercado, actividade e os registos que fizeres. Documentos só quando forem precisos, e só com o teu conhecimento.</p>

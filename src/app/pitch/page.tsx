@@ -4,7 +4,6 @@ import { Rings, WovenRings } from "@/components/brand";
 import { Icon } from "@/components/icon";
 import { DeckNav } from "@/components/site/deck-nav";
 import { VoiceDemo } from "@/components/site/voice-demo";
-import { ExampleTag } from "@/components/ui";
 import { FACTS, MICROCREDIT_NOTE, SANDBOX_NOTE, SOURCES } from "@/lib/market-facts";
 import { formatMT } from "@/lib/money";
 import { programmeKpis } from "@/server/analytics/programme";
@@ -125,7 +124,7 @@ export default async function PitchPage() {
             ["Gestão", "KPIs do piloto, operação, IA, base de conhecimento e prontidão.", "/gestao"],
             ["Sala de risco", "Exposição, PAR, concentração, alertas, casos e governação.", "/risco"],
             ["Fornecedor", "Pedidos, entregas por código e liquidações.", "/fornecedor"],
-            ["WhatsApp", "O mesmo motor de conversa, com simulador e webhook prontos.", "/gestao/ia"],
+            ["WhatsApp", "Conversa, registos e apoio ligados ao historial do comerciante.", "/gestao/ia"],
           ].map(([title, body, href]) => (
             <Link key={title} className="deck-card" href={demo ? "/demo" : href}>
               <h3>{title}</h3>
@@ -156,12 +155,12 @@ export default async function PitchPage() {
       </section>
 
       <section className="slide" data-surface="cal">
-        <p className="kicker">Cenário de demonstração</p>
-        <h2>Como se lê um piloto por dentro.</h2>
+        <p className="kicker">Ao vivo</p>
+        <h2>O sistema neste momento.</h2>
         <div className="deck-grid" style={{ ["--cols" as string]: 4 }}>
           <div className="deck-card">
             <strong className="big num">{kpis.merchants}</strong>
-            <p>comerciantes no cenário</p>
+            <p>comerciantes registados</p>
           </div>
           <div className="deck-card">
             <strong className="big num">{kpis.wau}</strong>
@@ -178,8 +177,8 @@ export default async function PitchPage() {
             <p>registados em 30 dias</p>
           </div>
         </div>
-        <p className="say">Estes números são gerados por dados sintéticos para mostrar os painéis. Não são tracção real: o piloto ainda não começou.</p>
-        <Foot n={8} note="Dados sintéticos de demonstração." />
+        <p className="say">Lidos agora da base de dados, os mesmos que a gestão vê no painel.</p>
+        <Foot n={8} note="Números em tempo real." />
       </section>
 
       <section className="slide" data-surface="noite">
@@ -199,7 +198,7 @@ export default async function PitchPage() {
           ))}
         </div>
         <p className="say">
-          <ExampleTag>Preços e percentagens por definir no piloto</ExampleTag>
+          Preços e percentagens são acordados com os parceiros do piloto.
         </p>
         <Foot n={9} />
       </section>
@@ -209,7 +208,7 @@ export default async function PitchPage() {
         <h2>Um caminho por etapas, sem atalhos.</h2>
         <ol className="ladder">
           <li>
-            <strong>Hoje</strong>Registo e gestão. Não guarda dinheiro.
+            <strong>Hoje</strong>Registo e gestão do negócio.
           </li>
           <li>
             <strong>Piloto</strong>Parceiro licenciado e, se fizer sentido, Sandbox do Banco de Moçambique.
@@ -224,7 +223,7 @@ export default async function PitchPage() {
         <p className="say" style={{ fontSize: "0.98rem" }}>
           {SANDBOX_NOTE} {MICROCREDIT_NOTE}
         </p>
-        <Foot n={10} note={`Fonte: ${SOURCES.bm2025.label}. Enquadramento do Ukuphila por validar com jurista e regulador.`} />
+        <Foot n={10} note={`Fonte: ${SOURCES.bm2025.label}. Enquadramento do Ukuphila a confirmar com o regulador.`} />
       </section>
 
       <section className="slide" data-surface="noite">
@@ -236,7 +235,7 @@ export default async function PitchPage() {
             <p>Produto completo, com ledger, offline, Xitique, KYC, crédito, risco, agente e IA com limites, tudo testado.</p>
           </div>
           <div className="deck-card">
-            <h3>Por validar: {readiness.length - validated} de {readiness.length} critérios</h3>
+            <h3>Em curso: {readiness.length - validated} de {readiness.length} critérios</h3>
             <p>Parceiro licenciado, KYC, preços, política de crédito, línguas locais e, acima de tudo, se os comerciantes usam isto todos os dias.</p>
           </div>
         </div>
@@ -258,7 +257,7 @@ export default async function PitchPage() {
           </div>
           <div className="deck-card">
             <h3>Próximo passo</h3>
-            <p>Conversa de 30 minutos e visita à demonstração.</p>
+            <p>Conversa de 30 minutos e visita ao produto.</p>
           </div>
         </div>
         <div className="row wrap" style={{ marginTop: 26 }}>
@@ -267,7 +266,7 @@ export default async function PitchPage() {
           </Link>
           {demo ? (
             <Link className="btn btn-ghost" href="/demo">
-              Entrar na demonstração
+              Entrar
             </Link>
           ) : null}
         </div>

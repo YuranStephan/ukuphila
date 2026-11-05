@@ -19,6 +19,7 @@ const csp = [
 ].join("; ");
 
 const config: NextConfig = {
+  distDir: process.env.UKUPHILA_BUILD_DIR ?? ".next",
   poweredByHeader: false,
   turbopack: { root: process.cwd() },
   serverExternalPackages: ["@electric-sql/pglite", "pg", "qrcode"],
