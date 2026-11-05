@@ -1,6 +1,7 @@
 import { and, eq, ne } from "drizzle-orm";
 import type { Metadata } from "next";
 import { createStaffAction, setUserStatusAction } from "@/actions/gestao";
+import { changePasswordAction } from "@/actions/people";
 import { TotpEnrol } from "@/components/console/totp-enrol";
 import { ActionForm, SubmitButton } from "@/components/forms";
 import { Badge, PageHead, SectionTitle } from "@/components/ui";
@@ -72,6 +73,24 @@ export default async function TeamPage() {
           <section className="card">
             <SectionTitle title="Autenticação forte" />
             {me?.totpEnabledAt ? <p className="small muted">Já activa nesta conta.</p> : <TotpEnrol />}
+          </section>
+          <section className="card">
+            <SectionTitle title="A minha palavra-passe" />
+            <ActionForm action={changePasswordAction}>
+              <div className="field">
+                <label htmlFor="current">Palavra-passe actual</label>
+                <input id="current" className="input" type="password" name="current" autoComplete="current-password" required />
+              </div>
+              <div className="field">
+                <label htmlFor="next">Nova palavra-passe</label>
+                <input id="next" className="input" type="password" name="next" autoComplete="new-password" minLength={12} required />
+              </div>
+              <div className="field">
+                <label htmlFor="confirm">Repete a nova</label>
+                <input id="confirm" className="input" type="password" name="confirm" autoComplete="new-password" minLength={12} required />
+              </div>
+              <SubmitButton>Mudar palavra-passe</SubmitButton>
+            </ActionForm>
           </section>
           {manage ? (
             <section className="card">
