@@ -20,6 +20,8 @@ export default function PrivacyPage() {
           <p>Quando autorizas o assistente, o texto pode ser enviado a um fornecedor de IA para interpretar o que disseste. Saldos e dados de terceiros não são enviados com esse objectivo. Sem autorização, o Ukuphila usa só o intérprete que corre no próprio sistema.</p>
           <h2>Partilha</h2>
           <p>Não vendemos dados. Só partilhas o teu historial por iniciativa tua, através de um passaporte com prazo. Os números agregados nunca mostram um grupo com menos de cinco pessoas.</p>
+          <h2>Visitas ao site</h2>
+          <p>Usamos o Vercel Web Analytics para contar visitas às páginas públicas. Filtramos os endereços das páginas para retirar parâmetros e não contabilizamos as áreas privadas da aplicação.</p>
           <h2>Conservação</h2>
           <p>[Prazo a definir com a política de retenção aprovada.] Movimentos financeiros e registos de auditoria não se apagam durante o período legal aplicável.</p>
         </div>

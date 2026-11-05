@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { WhatsappContact } from "@/components/whatsapp-contact";
+import { SiteAnalytics } from "@/components/site/site-analytics";
 import { Bricolage_Grotesque, DM_Mono, Hanken_Grotesk } from "next/font/google";
 import "@/styles/base.css";
 import "@/styles/site.css";
@@ -30,7 +31,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-MZ" className={`${display.variable} ${body.variable} ${mono.variable}`}>
-      <body>{children}<WhatsappContact /></body>
+      <body>{children}<WhatsappContact /><SiteAnalytics /></body>
     </html>
   );
 }
